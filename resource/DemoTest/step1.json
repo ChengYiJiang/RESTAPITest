@@ -1,0 +1,1 @@
+{"id":"","Description":"Create a cabinet with name CJCABINET","validation":{"responseMessage":"OK","GPID_1_cmbLocation":"SITE A","responseCode":"200","GPID_1_cmbModel":"10RU-Cabinet S23","GPID_2_cmbMake":"ABN Braun"},"Method":"Item_Create","rawData":{"cmbModel":"10RU-Cabinet S23","cmbLocation":"SITE A","tiName":"CJCABINET","cmbMake":"ABN Braun"}}

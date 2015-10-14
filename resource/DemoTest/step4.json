@@ -1,0 +1,1 @@
+{"id":"**OverideRead_bladeID","protocol":"Ethernet/IP","index":"22","Description":"Create a data port for blade","dataRate":"1000 Base-Lx","validation":{"responseMessage":"OK","responseCode":"200","portId":"**OverideSave_pid"},"Method":"Dataport_Create","name":"DP1","connector":"RJ45","type":"Physical","media":"Twisted Pair"}

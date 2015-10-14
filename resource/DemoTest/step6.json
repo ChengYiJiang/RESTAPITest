@@ -1,0 +1,1 @@
+{"id":"**OverideRead_bladeID","Description":"get status of the port","validation":{"responseMessage":"OK","responseCode":"200","New Property":"New Value"},"Method":"Dataport_Retrieve","portId":"**OverideRead_pid"}

@@ -1,0 +1,1 @@
+{"id":"","cmbUPosition":"1","Description":"Create a CHASSIS in cab","cmbCabinet":"**OverideRead_cabName","validation":{"responseMessage":"OK","id":"**OverideSave_chassisID","responseCode":"200","tiName":"**OverideSave_chassisName"},"Method":"Item_Create","cmbModel":"Blade System c7000","cmbLocation":"SITE A","cmbMake":"HP","tiName":"CJCHASSIS"}

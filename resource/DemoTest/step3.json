@@ -1,0 +1,1 @@
+{"id":"","cmbUPosition":"1","cmbCabinet":"**OverideRead_cabName","Description":"Create a BLADE in CHASSIS","cmbChassis":"**OverideRead_chassisName","validation":{"id":"**OverideSave_bladeID","responseMessage":"OK","responseCode":"200"},"Method":"Item_Create","cmbModel":"Blade 81Q PCIe","cmbLocation":"SITE A","tiName":"CJBLADE","cmbMake":"HP"}

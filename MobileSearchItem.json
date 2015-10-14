@@ -1,0 +1,1 @@
+{"Description":"","validation":{"1":{"1":{"id":"**OverideSave_itemId","tiLocationRef":"AUTO","cmbModel":"PowerEdge 1955","tiName":"CHASSIS1"}},"0":{"responseMessage":"OK","responseCode":"200"}},"Method":"MobileSearch_Post","payload":{"limit":50,"locations":[10],"searchString":"CHASSIS1","offset":0},"searchType":"item"}
