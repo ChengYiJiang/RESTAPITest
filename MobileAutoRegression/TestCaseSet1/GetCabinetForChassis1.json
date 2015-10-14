@@ -1,0 +1,1 @@
+{"modelId":"257","Description":"","validation":{"1":{"1":{"id":"**OverideSave_CabId","data":"CABINET1"}},"0":{"responseMessage":"OK","responseCode":"200"}},"Method":"MobilePlacement_Post","payload":{"uiId":"cmbCabinet","cmbLocationId":"10"},"itemId":"**OverideRead_itemId"}
