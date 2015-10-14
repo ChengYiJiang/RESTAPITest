@@ -13,6 +13,7 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.math.BigInteger;
 import java.util.Enumeration;
 import java.util.Hashtable;
 import java.util.Iterator;
@@ -490,7 +491,7 @@ public class JSONViewer extends JPanel implements ActionListener,
 		return panel;
 	}
 
-	private void formatJSON(Object obj, int level, String k, String v,
+	private void formatJSON(Object obj, int level, String k, Object v,
 			boolean isObject, boolean isLast, boolean isDeletedSpace,
 			boolean isDeleteAndCont) {
 		if (!isDeletedSpace) {
@@ -537,11 +538,14 @@ public class JSONViewer extends JPanel implements ActionListener,
 					object = ((IdScriptableObject) (obj)).get(
 							Integer.parseInt(key), null);
 				}
+				/*
 				String value = null;
 				if (object != null)
 					value = object.toString().replaceAll("^(.+)\\.0$", "$1");
 				else
 					value = null;
+					*/
+				Object value = object;
 				formatJSON(object, lev, key, value, true, i == len - 1,
 						isDeletedSpace, isDeleteAndCont);
 			}
@@ -623,16 +627,29 @@ public class JSONViewer extends JPanel implements ActionListener,
 			}
 			isObject = false;
 		} else {
-			String vv = "";
+			String vv = "";			
 			if (v != null){
-				v = v.replaceAll("(\"|\\\\)", "\\\\$1");
-				//String vv = "";
-				if (!isDeleteAndCont) {
-					vv = isObject ? ("\"" + k + "\": \"" + v + "\"")
-							: ("\"" + v + "\"");
-				} else {
-					vv = isObject ? ("\\\"" + k + "\\\": \\\"" + v + "\\\"")
-							: ("\\\"" + v + "\\\"");
+				if (v instanceof String){
+					String vS = v.toString().replaceAll("(\"|\\\\)", "\\\\$1");
+					//String vv = "";
+					if (!isDeleteAndCont) {
+						vv = isObject ? ("\"" + k + "\": \"" + vS + "\"") : ("\"" + vS + "\"");
+					} else {
+						vv = isObject ? ("\\\"" + k + "\\\": \\\"" + vS + "\\\"") : ("\\\"" + vS + "\\\"");
+					}
+				} else if (v instanceof Number){
+					String vS = "";
+					if (isInteger(v)){
+						vS = String.valueOf(Integer.parseInt(v.toString().replace(".0", "")));
+					}
+					else if (isDouble(v)){
+						vS = String.valueOf(Double.parseDouble(v.toString()));
+					}
+					if (!isDeleteAndCont) {
+						vv = isObject ? ("\"" + k + "\": " + vS) : (v.toString());
+					} else {
+						vv = isObject ? ("\\\"" + k + "\\\": " + vS) : (v.toString());
+					}
 				}
 				vv = isLast ? vv : vv + ",";
 				if (!isDeletedSpace) {
@@ -657,6 +674,29 @@ public class JSONViewer extends JPanel implements ActionListener,
 				}
 			}
 		}
+	}
+	
+	private boolean isInteger(Object o){
+		try {
+			String oo = "";			
+			if ((o.toString().endsWith(".0")))
+				oo = o.toString().replace(".0", "");			
+			Integer.parseInt(oo); 
+			return true; 
+		} catch (NumberFormatException e) { 
+			return false; 
+		}
+	}
+	
+	private boolean isDouble(Object o) { 
+		try { 
+			Double.parseDouble(o.toString()); 
+			if (o.toString().contains(".")) 
+				return true; 		
+		} catch (NumberFormatException e) { 
+			return false; 
+		} 
+		return false;
 	}
 
 }
