@@ -38,7 +38,7 @@ public class RestPropValidation {
 	public String[] validateP(JSONObject r, JSONObject json, String path, ConcurrentHashMap<String, String> requestOveride, String d) throws FileNotFoundException, IOException, JSONException {
 		//maxDeepth = 0;
 		correctGroup.clear();
-		overideProps.putAll(requestOveride);
+		//overideProps.putAll(requestOveride);
 		
 
 		result[0] = seperator + "-------------------------------------------" + seperator + "Validation result for " + path + ":" + seperator + d + seperator + "-----------------------------------------" + "-------------------------------------------";
@@ -77,13 +77,17 @@ public class RestPropValidation {
 		//sizeOfV = vSub.
 		System.out.println("maxDeepth is: " + maxDeepth);
 		String levelOne = "";
+		
+		//loop the VALIDATION JSON
 		Iterator<String> bigIter = vSub.keys();   //this bigIter is actually the level like 3_1 so bigIter is 1
 		while (bigIter.hasNext()) {
 			String bigKey = bigIter.next();
-			System.out.println("Big key is " + bigKey + " and ooo is " +
-			String.valueOf(1 + offset));
-			if (bigKey.equals(String.valueOf(offset)))
+			System.out.println("Level is " + bigKey + " and offset: " + String.valueOf(offset));
+			System.out.println("The validation JSON for Bigkey " + bigKey + " is: " + vSub.get(bigKey));
+			if (bigKey.equals(String.valueOf(offset))){
+				System.out.println("Now we want to validate this level since offset: " + offset + " equals bigKey");
 				levelOne = bigKey;
+			}
 		}
 		// Pair<String, String> p = new
 		if (vSub.has(levelOne)) { // only check for group that
@@ -130,9 +134,10 @@ public class RestPropValidation {
 					return false;
 				}
 			}
-			// the the group that (id - offset == 1) is complete and good
+			//  the level that (id - offset == 1) is complete and good
 		} else{
-			return false;// end of if
+			System.out.println("Cannot find level: " + levelOne);
+			//return false;// end of if
 		}
 		
 		//========= NOW LEVEL offset HAS THE RIGHT VALIDATION KEY-VALUE PAIR
@@ -151,9 +156,11 @@ public class RestPropValidation {
 					// check if it is a json object or json array
 					if (r.get(tmpStr) instanceof JSONObject) {
 						maxDeepth ++;
+						System.out.println("IT IS A JSON Object with key: " + tmpStr);
 						result = result & searchGroupingValidation(r.getJSONObject(tmpStr), vSub, offset + 1);
 					} else if ((r.get(tmpStr) instanceof JSONArray)) {
 						maxDeepth ++;
+						System.out.println("IT IS A JSON Array with key: " + tmpStr);
 						JSONArray jArray = r.getJSONArray(tmpStr);
 						boolean tempResult = false;
 						for (int i = 0; i < jArray.length(); i++) {
@@ -163,7 +170,7 @@ public class RestPropValidation {
 								tempResult = tempResult || tmpBoolean;
 							}
 						}
-						result = result || tempResult;
+						result = result & tempResult;
 					} else {
 						// TODO: HERE FOR SMART CHART
 					}
@@ -203,7 +210,7 @@ public class RestPropValidation {
 		while (vIterator.hasNext()) {
 			String vKey = vIterator.next();
 			//System.out.println("vKey is " + vKey);
-			if (!vKey.equals("0")){
+			if (!vKey.equals("0") && !correctGroup.contains(vKey)){
 				maxDeepth = 0;
 				JSONObject levelsForGroup = v.getJSONObject(vKey);
 				Iterator<String> levelsInterator = levelsForGroup.keys();
@@ -213,9 +220,13 @@ public class RestPropValidation {
 					if (Integer.valueOf(levelKey) > maxDeepthInValidation)
 						maxDeepthInValidation = Integer.valueOf(levelKey);
 				}
+				System.out.println("============================================================================");
+				System.out.println("NOW START VALIDATING GROUP: " + vKey);
+				System.out.println("The response here is: " + r);
 				System.out.println("In corr() the maxDeepthInValidation is " + maxDeepthInValidation);
 				System.out.println("And now the maxDeepth = " + maxDeepth);
 				if (searchGroupingValidation(r, v.getJSONObject(vKey), 0) && maxDeepth >= maxDeepthInValidation) { // IMPORTANT
+					System.out.println("GROUP: " + vKey + " IS GOOD!");
 					correctGroup.add(vKey);
 				}
 			//}
@@ -228,7 +239,7 @@ public class RestPropValidation {
 		}
 
 		// now let's go for group 0
-		// System.out.println("now let's go for group 0");
+		//System.out.println("now let's go for group 0");
 
 		Iterator<String> responseIterator = r.keys();
 		while (responseIterator.hasNext()) {
@@ -239,10 +250,10 @@ public class RestPropValidation {
 			Object o = r.get(key);
 			String toStringValue = null;
 			if (o instanceof JSONObject) { // reversal
-				//System.out.println("Key is " + key + " which get an JSONObject");
+				System.out.println("Key is " + key + " which get an JSONObject");
 				corr((JSONObject) o, v);
 			} else if (o instanceof JSONArray) {
-				//System.out.println("Key is " + key + " which get an JSONArray");
+				System.out.println("Key is " + key + " which get an JSONArray");
 				JSONArray tmp = (JSONArray) o;
 				corrArray(tmp, v, key); // now using another recursive function
 
