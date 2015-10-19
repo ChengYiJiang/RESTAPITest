@@ -24,9 +24,10 @@ public class RestPropValidation {
 	String[] result = new String[3];
 	String tcPath;
 	private HashSet<String> correctGroup = new HashSet<String>();
-
+	private int maxDeepth;
+	private int sizeOfV;
 	public RestPropValidation() {
-
+		
 	}
 
 	public HashMap<String, String> getOverideHM() {
@@ -35,9 +36,10 @@ public class RestPropValidation {
 
 	// r is the response JSONObject, json is the validation JSONObject :<
 	public String[] validateP(JSONObject r, JSONObject json, String path, ConcurrentHashMap<String, String> requestOveride, String d) throws FileNotFoundException, IOException, JSONException {
-
+		//maxDeepth = 0;
 		correctGroup.clear();
 		overideProps.putAll(requestOveride);
+		
 
 		result[0] = seperator + "-------------------------------------------" + seperator + "Validation result for " + path + ":" + seperator + d + seperator + "-----------------------------------------" + "-------------------------------------------";
 		result[1] = "PASS";
@@ -72,13 +74,14 @@ public class RestPropValidation {
 	// vSub is the JSONObject with key group id. it only contains levels!!!
 	public boolean searchGroupingValidation(JSONObject r, JSONObject vSub, int offset) throws JSONException {
 		boolean result = true;
-
+		//sizeOfV = vSub.
+		System.out.println("maxDeepth is: " + maxDeepth);
 		String levelOne = "";
-		Iterator<String> bigIter = vSub.keys();
+		Iterator<String> bigIter = vSub.keys();   //this bigIter is actually the level like 3_1 so bigIter is 1
 		while (bigIter.hasNext()) {
 			String bigKey = bigIter.next();
-			// System.out.println("Big key is " + bigKey + " and ooo is " +
-			// String.valueOf(1 + offset));
+			System.out.println("Big key is " + bigKey + " and ooo is " +
+			String.valueOf(1 + offset));
 			if (bigKey.equals(String.valueOf(offset)))
 				levelOne = bigKey;
 		}
@@ -88,12 +91,13 @@ public class RestPropValidation {
 			JSONObject temp = vSub.getJSONObject(levelOne); // json
 			Iterator<String> groupIter = temp.keys(); // in group that (id -
 														// offset == 1)
-			while (groupIter.hasNext()) {
+			System.out.println("vSub has levelOne: " + levelOne);
+			while (groupIter.hasNext()) {   //loop the validation json for that 
 				String key1 = groupIter.next(); // pair-value
-				// System.out.println("The key in grouping map is " + key1);
+				System.out.println("The key in grouping level map is " + key1 + " and now offset is "+offset + " now maxDeepth is " + maxDeepth);
 
 				if (r.has(key1)) {
-					// System.out.println("Found key " + key1);
+					System.out.println("Found key " + key1);
 					if (r.get(key1) instanceof String || r.get(key1) instanceof Integer) {
 						System.out.println("And key in response is a string with data " + r.get(key1));
 						if (temp.get(key1).toString().startsWith("**OverideSave")) {
@@ -109,29 +113,34 @@ public class RestPropValidation {
 							}
 						} else if (!r.get(key1).toString().equals(temp.get(key1).toString())) { // not
 							// overide
-							// System.out.println("The key " + key1 +
-							// " with value " + r.get(key1) +
-							// " does not match that in map " +
-							// "currentMap.get(key1");
+							System.out.println("The key " + key1 +
+							" with value " + r.get(key1) +
+							" does not match that in map");
+							
 							return false; // not equals to validation data
 						}
 					} else { // key good but value is not a string
-						// System.out.println("The key " + key1 +
-						// " is not a string does not match that in map " +
-						// temp.get(key1).toString());
+						System.out.println("The key " + key1 +
+						" is not a string does not match that in map " +
+						temp.get(key1).toString());
 						return false;
 					}
 				} else { // even not contain the key
-					// System.out.println("The key " + key1 + " is not found");
+					System.out.println("In offset: " + offset + " The key " + key1 + " is not found");
 					return false;
 				}
 			}
 			// the the group that (id - offset == 1) is complete and good
-		} // end of if
+		} else{
+			return false;// end of if
+		}
+		
+		//========= NOW LEVEL offset HAS THE RIGHT VALIDATION KEY-VALUE PAIR
 			// the the group that (id - offset == 1) is complete and good
-		// System.out.println("Finish the group for offset " + offset);
+		System.out.println("Finish the group for offset " + offset);
 		// start go larger offset
-
+		
+		//KEEP GOING FOR NEXT LEVEL
 		Iterator<String> vJSONIter = vSub.keys(); // it is level
 		while (vJSONIter.hasNext()) {
 			String checkIfHasLargerLayerNum = vJSONIter.next();
@@ -141,8 +150,10 @@ public class RestPropValidation {
 					String tmpStr = rJSONIter.next();
 					// check if it is a json object or json array
 					if (r.get(tmpStr) instanceof JSONObject) {
+						maxDeepth ++;
 						result = result & searchGroupingValidation(r.getJSONObject(tmpStr), vSub, offset + 1);
 					} else if ((r.get(tmpStr) instanceof JSONArray)) {
+						maxDeepth ++;
 						JSONArray jArray = r.getJSONArray(tmpStr);
 						boolean tempResult = false;
 						for (int i = 0; i < jArray.length(); i++) {
@@ -152,13 +163,14 @@ public class RestPropValidation {
 								tempResult = tempResult || tmpBoolean;
 							}
 						}
-						result = result & tempResult;
+						result = result || tempResult;
 					} else {
 						// TODO: HERE FOR SMART CHART
 					}
 				}
 			}
 		}
+		//if (maxDeepth < offset) maxDeepth++;
 		return result;
 	}
 
@@ -191,10 +203,25 @@ public class RestPropValidation {
 		while (vIterator.hasNext()) {
 			String vKey = vIterator.next();
 			//System.out.println("vKey is " + vKey);
-			if (!vKey.equals("0") && searchGroupingValidation(r, v.getJSONObject(vKey), 0)) { // IMPORTANT
+			if (!vKey.equals("0")){
+				maxDeepth = 0;
+				JSONObject levelsForGroup = v.getJSONObject(vKey);
+				Iterator<String> levelsInterator = levelsForGroup.keys();
+				int maxDeepthInValidation = 0;
+				while (levelsInterator.hasNext()){
+					String levelKey = levelsInterator.next();
+					if (Integer.valueOf(levelKey) > maxDeepthInValidation)
+						maxDeepthInValidation = Integer.valueOf(levelKey);
+				}
+				System.out.println("In corr() the maxDeepthInValidation is " + maxDeepthInValidation);
+				System.out.println("And now the maxDeepth = " + maxDeepth);
+				if (searchGroupingValidation(r, v.getJSONObject(vKey), 0) && maxDeepth >= maxDeepthInValidation) { // IMPORTANT
+					correctGroup.add(vKey);
+				}
+			//}
 				// System.out.println("Found group " + vKey +
 				// " And they are correct"); // HERE!!!
-				correctGroup.add(vKey);
+				
 
 				// TODO: PRINT GROUP DETAILS MAY BE NOT
 			}

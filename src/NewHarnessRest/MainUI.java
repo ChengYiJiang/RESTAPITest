@@ -393,9 +393,10 @@ public class MainUI {
 		
 		Map<String, Object> abc = new HashMap<String, Object>();
 		abc.put("a", "bbb");
-		abc.put("a", "ccc");
-		abc.put("a", null);
+		abc.put("a", new Double(123.00));
+		//abc.put("a", null);
 		System.out.println(abc.get("a"));
+		//if (abc.get("a"))
 		
 	}	
 	
