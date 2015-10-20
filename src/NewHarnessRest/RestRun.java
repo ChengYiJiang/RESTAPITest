@@ -230,8 +230,8 @@ public class RestRun implements Runnable {
 		
 		
 		// sending request
-		//String authString = "admin:sunbird";
-		String authString = "admin:raritan";
+		String authString = "admin:sunbird";
+		//String authString = "admin:raritan";
 		String authStringEnc = new String(Base64.encodeBase64(authString
 				.getBytes()));
 		try {

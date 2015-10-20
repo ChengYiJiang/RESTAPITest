@@ -38,7 +38,9 @@ public class RestPropValidation {
 	public String[] validateP(JSONObject r, JSONObject json, String path, ConcurrentHashMap<String, String> requestOveride, String d) throws FileNotFoundException, IOException, JSONException {
 		//maxDeepth = 0;
 		correctGroup.clear();
-		//overideProps.putAll(requestOveride);
+		//commet here for test only
+		if (requestOveride != null)
+			overideProps.putAll(requestOveride);
 		
 
 		result[0] = seperator + "-------------------------------------------" + seperator + "Validation result for " + path + ":" + seperator + d + seperator + "-----------------------------------------" + "-------------------------------------------";
