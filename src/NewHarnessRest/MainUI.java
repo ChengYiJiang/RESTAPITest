@@ -9,26 +9,16 @@ import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
 import java.io.BufferedWriter;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-import java.math.BigInteger;
-import java.sql.Timestamp;
+
 import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
 import java.util.HashMap;
-import java.util.IdentityHashMap;
-import java.util.Iterator;
+
 import java.util.List;
 import java.util.Map;
-import java.util.Map.Entry;
-import java.util.Properties;
-import java.util.regex.Pattern;
 
 import javax.swing.Box;
 import javax.swing.BoxLayout;
@@ -42,12 +32,8 @@ import javax.swing.JSplitPane;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
-import org.apache.commons.lang.StringUtils;
-import org.codehaus.jackson.map.ObjectMapper;
-import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
-import org.postgresql.jdbc2.TimestampUtils;
 
 
 public class MainUI {	
@@ -67,7 +53,7 @@ public class MainUI {
 		public void mouseClicked(MouseEvent e) {
             if(e.getClickCount() ==2) {
             	String temp = ((JList)e.getSource()).getSelectedValue().toString();   
-            	requestView.updateData(temp);  
+            	requestView.updateData(temp);
             	try {
 					PropEditView.updateData(temp);
 				} catch (IOException e1) {					
@@ -244,7 +230,7 @@ public class MainUI {
 					}
 				}
 				else{
-					listFileView.setTargetURL(s);
+					listFileView.setTargetURL("https://" + s);
 					try {
 						libsView.reconnDB(s);
 					} catch (InstantiationException | IllegalAccessException e) {
@@ -389,15 +375,7 @@ public class MainUI {
 			new MainUI("").init();
 		} catch (IOException e) {			
 			e.printStackTrace();
-		}			
-		
-		Map<String, Object> abc = new HashMap<String, Object>();
-		abc.put("a", "bbb");
-		abc.put("a", new Double(123.00));
-		//abc.put("a", null);
-		System.out.println(abc.get("a"));
-		//if (abc.get("a"))
-		
+		}	
 	}	
 	
 }

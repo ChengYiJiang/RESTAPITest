@@ -156,6 +156,9 @@ public class RestRequestView extends JPanel{
 		    model.addRow(new String[] {"Method",""});
 		    //model.addRow(new String[] {"id",""});
 		    model.addRow(new String[] {"Description",""});
+		    model.addRow(new String[] {"username",""});
+		    model.addRow(new String[] {"password",""});
+		    model.addRow(new String[] {"url",""});
 		    
 		    jlabel.setText("");
 		}

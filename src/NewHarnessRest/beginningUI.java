@@ -69,10 +69,10 @@ public class beginningUI {
 			public void actionPerformed(ActionEvent event) {
 				String temp = name.getText();
 				if (temp.startsWith("https://")){
-					targetU = name.getText() + "/api/v1";
+					targetU = name.getText() + "/";
 					sessionID = new cookieGetter().getCookie(temp);
 				}else{
-					targetU = "https://" + name.getText() + "/api/v1";	
+					targetU = "https://" + name.getText() + "/";	
 					sessionID = new cookieGetter().getCookie("https://" + temp);
 				}
 				System.out.println("session id is "+sessionID);
@@ -180,7 +180,7 @@ public class beginningUI {
 			if (fList[i].endsWith(".tc"))
 				toRun.add(folderPath+"/"+fList[i]);
 		}
-		ArrayList<String[]> result = new MultiThreadRest(toRun, "https://"+ ip +"/api/v1", 5, false, false).runTestCases(toRun);
+		ArrayList<String[]> result = new MultiThreadRest(toRun, "https://"+ ip, 5, false, false).runTestCases(toRun);
 		ArrayList<String> failList = new ArrayList<String>(); 
 		
 		String r = "";

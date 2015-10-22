@@ -37,6 +37,8 @@ public class ListFileView extends JPanel {
 	public JButton addFromRightButton = new JButton("Add Step from Right");
 	public JButton addURLButton = new JButton("Set");
 	private JTextField name = new JTextField(30);
+	private JTextField userName = new JTextField(30);
+	private JTextField passWord = new JTextField(30);
 	public JCheckBox requestRaw = new JCheckBox("Show Raw Request"); 
 	public JCheckBox responseRaw = new JCheckBox("Show Raw Response");
 	
@@ -64,6 +66,8 @@ public class ListFileView extends JPanel {
 
 	public void setTargetURL(String u) {
 		url = u;
+		name.setText(url);
+		name.updateUI();
 	}
 
 	public JList getJList() {
@@ -128,13 +132,12 @@ public class ListFileView extends JPanel {
 		runRestButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				
-				if (!url.equals("")) {
-					new SSLVerificationDisabler().disableSslVerification(); // disabling HTTPS checks
-					ReportViewInMainUI reportView = new ReportViewInMainUI();
-					reportView.ta.append("Please wait for a while when processing the requestes......");
-					ExecutorService pool = Executors.newCachedThreadPool();
-					pool.submit(new RestRun(url, reportView.ta, jl.getSelectedValuesList(), requestRaw.isSelected(), responseRaw.isSelected()));			
-				}
+				new SSLVerificationDisabler().disableSslVerification(); // disabling HTTPS checks
+				ReportViewInMainUI reportView = new ReportViewInMainUI();
+				reportView.ta.append("Please wait for a while when processing the requestes......");
+				ExecutorService pool = Executors.newCachedThreadPool();
+				pool.submit(new RestRun(url, reportView.ta, jl.getSelectedValuesList(), requestRaw.isSelected(), responseRaw.isSelected()));			
+				
 			}
 		});
 

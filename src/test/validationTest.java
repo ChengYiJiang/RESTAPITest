@@ -17,7 +17,7 @@ public class validationTest {
 	
 	public static void init() throws JSONException{
 		responseJSON = new JSONObject("{\"first\": \"first1\",\"kkk\":{\"limit\": 50,\"locations\":{\"abc\": \"abc1\",\"bcd\": \"bcd1\"},\"searchString\": \"CHASSIS1\",\"offset\": 0}}");
-		validationJSON = new JSONObject("{\"1\":{\"2\":{\"abc\": \"abc1\"},\"0\":{\"first\": \"first1\"},\"7\":{\"first2\": \"first3\"}}}");
+		validationJSON = new JSONObject("{\"1\":{\"2\":{\"abc\": \"abc1\"},\"0\":{\"first\": \"first1\"}}}");
 	}
 	
 	public static void main(String[] args) throws JSONException, FileNotFoundException, IOException {

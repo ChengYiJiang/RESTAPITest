@@ -33,6 +33,7 @@ import javax.net.ssl.X509TrustManager;
 import javax.swing.JTextArea;
 
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
@@ -154,7 +155,9 @@ public class RestRun implements Runnable {
 		JSONObject[] result = new JSONObject[3];
 		
 		boolean isGet = false;
-		String URL = "";
+		String URL = null;
+		if (r.has("url"))
+				 URL = r.getString("url");
 		JSONObject jsonV = r.getJSONObject("validation");
 		// description for future use
 		description = r.getString("Description");
@@ -178,8 +181,6 @@ public class RestRun implements Runnable {
 		// Now for overide params in request body:
 		// Iterator all key - value and if the value starts with **Overide
 		// Then replace from HashMap
-		
-		
 		
 		//TODO!!!!!  REVERSE JSONrawData and replace all Overide
 		//MAYBE USE FUNCTION ABOVE
@@ -225,12 +226,18 @@ public class RestRun implements Runnable {
 		}
 
 		service = sv.getServiceString();
+		URL url = null;
+		if (r.has("url") && !StringUtils.isEmpty(r.getString("url"))){
+			url = new URL(r.getString("url") + "/" + nURL);			
+		}
+		else
+			url = new URL(targetURL + "/" + nURL);
 		
-		URL url = new URL(targetURL + "/" + nURL);
-		
-		
-		// sending request
-		String authString = "admin:sunbird";
+		String authString = null;
+		if (checkHasProperty("username", r) && checkHasProperty("password", r))
+			authString = r.getString("username")+":"+r.getString("password");
+		else
+			authString = "admin:sunbird";
 		//String authString = "admin:raritan";
 		String authStringEnc = new String(Base64.encodeBase64(authString
 				.getBytes()));
@@ -367,6 +374,12 @@ public class RestRun implements Runnable {
 			FailedRecord.add(sourcePath);
 		}
 		this.downLatch.countDown();
+	}
+	
+	private boolean checkHasProperty(String key, JSONObject j) throws JSONException{
+		if (j.has(key) && j.get(key) != null)
+			return true;
+		return false;
 	}
 
 }
