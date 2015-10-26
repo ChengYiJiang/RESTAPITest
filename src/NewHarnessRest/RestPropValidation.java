@@ -85,7 +85,7 @@ public class RestPropValidation {
 	}
 
 	// vSub is the JSONObject with key group id. it only contains levels!!!
-	public void searchGroupingValidation(JSONObject r, JSONObject vSub, String vKey, int offset, List<String> wentVLevels) throws JSONException {
+	public void searchGroupingValidation(JSONObject r, JSONObject vSub, String vKey, int offset) throws JSONException {
 		boolean result = true;
 		
 		//sizeOfV = vSub.
@@ -178,21 +178,20 @@ public class RestPropValidation {
 			//  the level that (id - offset == 1) is complete and good
 		} else{
 			System.out.println("Cannot find level or level already verified: " + levelOne);
+			result = false;
 			
 		}
 		
 		//========= NOW LEVEL offset HAS THE RIGHT VALIDATION KEY-VALUE PAIR
 			// the the group that (id - offset == 1) is complete and good
 		System.out.println("Finish the group for offset " + offset + " and this is level " + levelOne);
-		wentVLevels.add(levelOne);
+		//wentVLevels.add(levelOne);
 		if (result && !checkGroup.get(vKey).contains(levelOne))
 			checkGroup.get(vKey).add(levelOne);
 		System.out.println("THIS IS WHEN WE SUCCESSFULLY VERIFIED ONE LEVEL: " + levelOne);
 		System.out.println("checkGroup is:\n" + checkGroup);
-		// start go larger offset
-		System.out.println("\n\n");		
+			
 		System.out.println("---------------------------------------------------------------------");
-		System.out.println("\n\n");	
 		
 		//KEEP GOING FOR NEXT LEVEL
 		Iterator<String> vJSONIter = vSub.keys(); // it is level
@@ -206,7 +205,7 @@ public class RestPropValidation {
 					if (r.get(tmpStr) instanceof JSONObject) {
 						maxDeepth ++;
 						System.out.println("IT IS A JSON Object with key: " + tmpStr);
-						searchGroupingValidation(r.getJSONObject(tmpStr), vSub, vKey, offset + 1, wentVLevels);
+						searchGroupingValidation(r.getJSONObject(tmpStr), vSub, vKey, offset + 1);
 					} else if ((r.get(tmpStr) instanceof JSONArray)) {
 						maxDeepth ++;
 						System.out.println("IT IS A JSON Array with key: " + tmpStr);
@@ -216,7 +215,7 @@ public class RestPropValidation {
 							Object obj = jArray.get(i);
 							System.out.println("!!!!!! IN " + tmpStr + " WE GET ONE OBJECT WHICH IS: " + obj + " and vSub is: " + vSub);
 							if (obj instanceof JSONObject) {
-								searchGroupingValidation(jArray.getJSONObject(i), vSub, vKey, offset + 1, wentVLevels);
+								searchGroupingValidation(jArray.getJSONObject(i), vSub, vKey, offset + 1);
 								
 							} else {
 								System.out.println("why it is not jsonobject???");
@@ -284,7 +283,7 @@ public class RestPropValidation {
 					correctGroup.add(vKey);
 				}
 				*/
-				searchGroupingValidation(r, v.getJSONObject(vKey), vKey, 0, new ArrayList<String>());
+				searchGroupingValidation(r, v.getJSONObject(vKey), vKey, 0);
 				if (checkGroup.get(vKey).size() == v.getJSONObject(vKey).length()){
 					System.out.println("GROUP: " + vKey + " IS GOOD!");
 					correctGroup.add(vKey);
