@@ -31,9 +31,6 @@ import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.json.*;
 
-
-
-
 //TODO ADD TO OPTION FOR REQUEST AND RESPONSE FOR OUTPUT WHEN RUNNING WITHOUT GUI
 
 
@@ -53,7 +50,7 @@ public class RestRequestSender implements Callable<String[]> {
 	private boolean responseShow = false;
 	RESTServiceFactory factory = new RESTServiceFactory();
 	private String _sessionID = "";
-
+	private JSONObject config;
 	private enum mType {
 		Post, Delete, Get, Put
 	}
@@ -71,22 +68,24 @@ public class RestRequestSender implements Callable<String[]> {
 	// TODO4: GUI AND NGUI
 
 	//this constructor for run without GUI
-	public RestRequestSender(String tcPath, List<String> fL, String turl, JTextArea t) {
+	public RestRequestSender(String tcPath, List<String> fL, String turl, JTextArea t, JSONObject config) {
 		this.targetURL = turl;
 		this.fileLocList = fL;
 		this.sourcePath = tcPath;
 		this.validateResult[0] = System.getProperty("line.separator") + "This thread proccessing test case: "+sourcePath + System.getProperty("line.separator");
 		this.validateResult[2] = sourcePath;
 		this.fromParent = t;
+		this.config = config;
 	}
 	
 	
 	//this constructor for run with GUI
-	public RestRequestSender(List<String> fL, String turl, boolean request, boolean response) {
+	public RestRequestSender(List<String> fL, String turl, boolean request, boolean response, JSONObject config) {
 		this.targetURL = turl;
 		this.fileLocList = fL;
 		this.requestShow = request;
 		this.responseShow = response;
+		this.config = config;
 	}
 
 	/**
@@ -110,11 +109,9 @@ public class RestRequestSender implements Callable<String[]> {
 	
 	//return JSONObject[3], [0] is request, [1] is the JSONObject for params validation, [2] is the response JSON
 	public JSONObject[] sendReqeust(JSONObject r) throws Throwable {
-
-		String service = ""; // for the very beginning step to get the response
-								// payload
+		
 		// start reading json
-		JSONObject[] result = new JSONObject[3];
+JSONObject[] result = new JSONObject[3];
 		
 		boolean isGet = false;
 		String URL = null;
@@ -162,11 +159,14 @@ public class RestRequestSender implements Callable<String[]> {
 		}
 
 		// json is the JSONObject that has been overided
-		RESTService sv = factory.getService(method[0], json);
-		
-		String nURL = sv.generateURL();
+		//RESTService sv = factory.getService(method[0], json);
+		//RESTService sv = factory.getService(json.get("Method").toString(), json, config);
+		//TODO: just use this factory to generate url and payload by the config JSON
+		//String nURL = sv.generateURL();
+		String nURL = factory.generateURL(r, config);
 		System.out.println("Generate URL: " + nURL);
-		String nPayload = sv.generatePayload().toString();
+		String nPayload = r.get("payload").toString();
+		//String nPayload = sv.generatePayload().toString();
 		System.out.println("Generate payload: " + nPayload);
 
 		switch (mType.valueOf(method[1])) {
@@ -187,13 +187,13 @@ public class RestRequestSender implements Callable<String[]> {
 			break;
 		}
 
-		service = sv.getServiceString();
+		//service = sv.getServiceString();
 		URL url = null;
-		if (r.has("url") && !StringUtils.isEmpty(r.getString("url"))){
-			url = new URL(r.getString("url") + "/" + nURL);			
+		if (r.has("url") && !StringUtils.isEmpty(r.getString("url"))){			
+			url = new URL(r.getString("url") + nURL);			
 		}
 		else
-			url = new URL(targetURL + "/" + nURL);
+			url = new URL(targetURL + nURL);
 		
 		String authString = null;
 		if (checkHasProperty("username", r) && checkHasProperty("password", r))
@@ -207,7 +207,7 @@ public class RestRequestSender implements Callable<String[]> {
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			System.out.println("URL IS " + con.getURL().getPath());
 			
-			if(!_sessionID.equals("") && sv.isCookieNeeded())
+			if(!_sessionID.equals("") ) //&& sv.isCookieNeeded())
 				con.setRequestProperty("Cookie", _sessionID);
 			
 			System.out.println("Add cookie with " + _sessionID);
@@ -245,10 +245,10 @@ public class RestRequestSender implements Callable<String[]> {
 			
 			if (con.getResponseCode() == 200) {							
 				if (responseBuilder.length() >= 2){
-					responseJSON = sv.parseLeafJSONData(new JSONObject(responseBuilder.toString()), Method);
+					responseJSON = factory.parseLeafJSONData(new JSONObject(responseBuilder.toString()), json.get("Method").toString(), config);
 				}
 				else
-					responseJSON = sv.parseLeafJSONData(new JSONObject(), Method);				
+					responseJSON = factory.parseLeafJSONData(new JSONObject(), json.get("Method").toString(), config);				
 				
 			} else {
 				System.out.println(responseBuilder.toString());

@@ -96,7 +96,7 @@ public class MultiThreadRest {
 					e.printStackTrace();
 				}
 				//es.submit(new RestRequestSender(tcList.get(i), toThread, targetURL, ta));
-				results.add(es.submit(new RestRequestSender(tcList.get(i), toThread, targetURL, ta)));
+				results.add(es.submit(new RestRequestSender(tcList.get(i), toThread, targetURL, ta, config)));
 				
 				//Future<String[]> singleResult = es.submit(new RestRequestSender(tcList.get(i), toThread, targetURL, ta));
 				System.out.println("File #"+ (i+1) +" Submitted to the pool...");

@@ -3,7 +3,10 @@ package NewHarnessRest;
 import java.awt.BorderLayout;
 import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.text.NumberFormat;
@@ -30,6 +33,9 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
+
+import org.json.JSONException;
+import org.json.JSONObject;
 
 public class beginningUI {
 	static String seperator = System.getProperty("line.separator");
@@ -171,7 +177,7 @@ public class beginningUI {
 	
 	
 	
-	public static void runWithoutGUI(String folderPath, String ip, String reportPath) throws InterruptedException, ExecutionException{
+	public static void runWithoutGUI(String folderPath, String ip, String reportPath, JSONObject config) throws InterruptedException, ExecutionException{
 		//new SSLVerificationDisabler().disableSslVerification();
 		File folder = new File(folderPath);
 		String[] fList = folder.list();
@@ -180,7 +186,7 @@ public class beginningUI {
 			if (fList[i].endsWith(".tc"))
 				toRun.add(folderPath+"/"+fList[i]);
 		}
-		ArrayList<String[]> result = new MultiThreadRest(toRun, "https://"+ ip, 5, false, false).runTestCases(toRun);
+		ArrayList<String[]> result = new MultiThreadRest(toRun, "https://"+ ip, 5, false, false, config).runTestCases(toRun);
 		ArrayList<String> failList = new ArrayList<String>(); 
 		
 		String r = "";
@@ -217,7 +223,7 @@ public class beginningUI {
 	
 	
 	
-	public static void main(String[] args) throws InterruptedException, ExecutionException {
+	public static void main(String[] args) throws Throwable {
 		// TODO Auto-generated method stub
 		//new beginningUI().init();
 		
@@ -227,8 +233,18 @@ public class beginningUI {
 			new beginningUI().init();		
 		else if (args[0].equals("NGUI")){
 			try{
+				
 			System.out.println("Your jar file path is: " + System.getProperty("user.dir")); 
-			runWithoutGUI(args[1], args[2], args[3]);
+			FileReader fr = new FileReader(args[4]); 
+			String line = null;
+	        StringBuffer strBuffer = new StringBuffer();		
+			BufferedReader br = new BufferedReader(fr);
+			while ((line = br.readLine()) != null)
+	        {
+	            strBuffer.append(line + System.getProperty("line.separator"));
+	        }         
+	        br.close();	       
+			runWithoutGUI(args[1], args[2], args[3], new JSONObject(strBuffer.toString()) );
 			//System.out.println("FINISHED!!!!!!!");
 			System.exit(0);
 			} catch (ArrayIndexOutOfBoundsException e){

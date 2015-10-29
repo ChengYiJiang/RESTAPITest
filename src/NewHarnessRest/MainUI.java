@@ -73,6 +73,8 @@ public class MainUI {
 	
 	public MainUI(String tcP, JSONObject config) throws IOException, JSONException{
 		this.tempTestCasePath = tcP;
+		System.out.println("Your jar file path is: " + System.getProperty("user.dir"));
+		//FileReader fr = new FileReader(System.getProperty("user.dir") + "\\config.json");
 		FileReader fr = new FileReader("C:\\Users\\ChengyiSunbird\\Desktop\\config.json"); 
 		String line = null;
         StringBuffer strBuffer = new StringBuffer();		
