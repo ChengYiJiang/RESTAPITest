@@ -7,11 +7,15 @@ import org.json.JSONObject;
 
 public abstract class RESTService {
 	
-	protected JSONObject rawData = new JSONObject();
+	protected JSONObject rawData = new JSONObject();	
 	
 	protected List<String> requiredURLParams;
 	
 	public RESTService(){		
+		
+	}
+	
+	public RESTService(JSONObject config){
 		
 	}
 	
@@ -34,5 +38,8 @@ public abstract class RESTService {
 	
 	abstract public JSONObject parseLeafJSONData(JSONObject response, String httpMethod);
 	abstract public String generateURL() throws Throwable;
+	public String generateURL(JSONObject config) {
+		return null;
+	}
 	abstract public JSONObject generatePayload() throws Throwable;
 }

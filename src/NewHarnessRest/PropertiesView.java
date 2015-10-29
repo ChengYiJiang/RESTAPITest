@@ -126,7 +126,7 @@ public class PropertiesView extends JPanel {
 						.getValueAt(i, 1).toString());
 		}
 		JSONObject result = new JSONObject(hm);
-		System.out.println("bbb " + result);
+		//System.out.println("bbb " + result);
 		return result;
 	}
 

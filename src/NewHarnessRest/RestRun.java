@@ -57,6 +57,7 @@ public class RestRun implements Runnable {
 	private boolean requestShow = false;
 	private boolean responseShow = false;
 	private String _sessionID = "";
+	JSONObject config;
 
 	private enum mType {
 		Post, Delete, Get, Put
@@ -101,13 +102,13 @@ public class RestRun implements Runnable {
 		this.responseShow = response;
 	}
 
-	public RestRun(String turl, JTextArea t, List<String> steps,
-			boolean request, boolean response) {
+	public RestRun(String turl, JTextArea t, List<String> steps, boolean request, boolean response, JSONObject config) {
 		fileLocList = steps;
 		this.targetURL = turl;
 		this.jta = t;
 		this.requestShow = request;
 		this.responseShow = response;
+		this.config = config;
 	}
 
 	// for overide  //  should be used to process the whole JSON and then...
@@ -147,9 +148,9 @@ public class RestRun implements Runnable {
 
 	// return JSONObject[3], [0] is request, [1] is the JSONObject for params
 	// validation, [2] is the response JSON
-	public JSONObject[] sendReqeust(JSONObject r) throws Throwable {
+	public JSONObject[] sendReqeust(JSONObject r, JSONObject config) throws Throwable {
 
-		String service = ""; // for the very beginning step to get the response
+		//String service = ""; // for the very beginning step to get the response
 								// payload
 		// start reading json
 		JSONObject[] result = new JSONObject[3];
@@ -200,11 +201,14 @@ public class RestRun implements Runnable {
 		}
 
 		// json is the JSONObject that has been overided
-		RESTService sv = factory.getService(method[0], json);
-		
-		String nURL = sv.generateURL();
+		//RESTService sv = factory.getService(method[0], json);
+		//RESTService sv = factory.getService(json.get("Method").toString(), json, config);
+		//TODO: just use this factory to generate url and payload by the config JSON
+		//String nURL = sv.generateURL();
+		String nURL = factory.generateURL(r, config);
 		System.out.println("Generate URL: " + nURL);
-		String nPayload = sv.generatePayload().toString();
+		String nPayload = r.get("payload").toString();
+		//String nPayload = sv.generatePayload().toString();
 		System.out.println("Generate payload: " + nPayload);
 
 		switch (mType.valueOf(method[1])) {
@@ -225,13 +229,13 @@ public class RestRun implements Runnable {
 			break;
 		}
 
-		service = sv.getServiceString();
+		//service = sv.getServiceString();
 		URL url = null;
-		if (r.has("url") && !StringUtils.isEmpty(r.getString("url"))){
-			url = new URL(r.getString("url") + "/" + nURL);			
+		if (r.has("url") && !StringUtils.isEmpty(r.getString("url"))){			
+			url = new URL(r.getString("url") + nURL);			
 		}
 		else
-			url = new URL(targetURL + "/" + nURL);
+			url = new URL(targetURL + nURL);
 		
 		String authString = null;
 		if (checkHasProperty("username", r) && checkHasProperty("password", r))
@@ -245,7 +249,7 @@ public class RestRun implements Runnable {
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			System.out.println("URL IS " + con.getURL().getPath());
 			
-			if(!_sessionID.equals("") && sv.isCookieNeeded())
+			if(!_sessionID.equals("") ) //&& sv.isCookieNeeded())
 				con.setRequestProperty("Cookie", _sessionID);
 			
 			System.out.println("Add cookie with " + _sessionID);
@@ -283,10 +287,10 @@ public class RestRun implements Runnable {
 			
 			if (con.getResponseCode() == 200) {							
 				if (responseBuilder.length() >= 2){
-					responseJSON = sv.parseLeafJSONData(new JSONObject(responseBuilder.toString()), Method);
+					responseJSON = factory.parseLeafJSONData(new JSONObject(responseBuilder.toString()), json.get("Method").toString(), config);
 				}
 				else
-					responseJSON = sv.parseLeafJSONData(new JSONObject(), Method);				
+					responseJSON = factory.parseLeafJSONData(new JSONObject(), json.get("Method").toString(), config);				
 				
 			} else {
 				System.out.println(responseBuilder.toString());
@@ -322,7 +326,7 @@ public class RestRun implements Runnable {
 				requestText = readFile(fileLocList.get(i).trim(),
 						StandardCharsets.UTF_8);
 				JSONObject j = new JSONObject(requestText);
-				JSONObject[] theResult = sendReqeust(j);
+				JSONObject[] theResult = sendReqeust(j, config);
 				String[] tempResult = vObj.validateP(theResult[2],
 						theResult[1], fileLocList.get(i), requestOveride,
 						description);

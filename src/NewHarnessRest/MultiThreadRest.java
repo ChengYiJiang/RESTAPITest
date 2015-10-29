@@ -26,6 +26,8 @@ import javax.net.ssl.TrustManager;
 import javax.net.ssl.X509TrustManager;
 import javax.swing.JTextArea;
 
+import org.json.JSONObject;
+
 
 
 public class MultiThreadRest {
@@ -41,6 +43,7 @@ public class MultiThreadRest {
 	private int num = 0;
 	private boolean reqShow = false;
 	private boolean resShow = false;
+	private JSONObject config;
 	
 	
 	public MultiThreadRest(List<String> fList, String url, int number, boolean req, boolean res) {
@@ -49,6 +52,15 @@ public class MultiThreadRest {
 		this.num = number;
 		this.reqShow = req;
 		this.resShow = res;
+	}
+	
+	public MultiThreadRest(List<String> fList, String url, int number, boolean req, boolean res, JSONObject config) {
+		this.files = fList;
+		targetURL = url;
+		this.num = number;
+		this.reqShow = req;
+		this.resShow = res;
+		this.config = config;
 	}
 	
 	

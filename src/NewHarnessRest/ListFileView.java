@@ -28,6 +28,8 @@ import javax.swing.JScrollPane;
 import javax.swing.JTextField;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.json.JSONObject;
+
 public class ListFileView extends JPanel {
 	private JFileChooser chooser = new JFileChooser(".");
 	private JList<String> jl;
@@ -41,6 +43,11 @@ public class ListFileView extends JPanel {
 	private JTextField passWord = new JTextField(30);
 	public JCheckBox requestRaw = new JCheckBox("Show Raw Request"); 
 	public JCheckBox responseRaw = new JCheckBox("Show Raw Response");
+	private JSONObject config;
+	
+	public void setConfig(JSONObject config){
+		this.config = config;
+	}
 	
 	
 	public ListFileView() {
@@ -51,8 +58,7 @@ public class ListFileView extends JPanel {
 		if (!fP.equals("")) {
 			BufferedReader br = new BufferedReader(new InputStreamReader(
 					new FileInputStream(fP)));
-			for (String line = br.readLine(); line != null; line = br
-					.readLine()) {
+			for (String line = br.readLine(); line != null; line = br.readLine()) {
 				listModel.addElement(line);
 			}
 		}
@@ -136,7 +142,8 @@ public class ListFileView extends JPanel {
 				ReportViewInMainUI reportView = new ReportViewInMainUI();
 				reportView.ta.append("Please wait for a while when processing the requestes......");
 				ExecutorService pool = Executors.newCachedThreadPool();
-				pool.submit(new RestRun(url, reportView.ta, jl.getSelectedValuesList(), requestRaw.isSelected(), responseRaw.isSelected()));			
+				System.out.println("HERE CONFIG IS: " + config.toString());
+				pool.submit(new RestRun(url, reportView.ta, jl.getSelectedValuesList(), requestRaw.isSelected(), responseRaw.isSelected(), config));			
 				
 			}
 		});
@@ -161,8 +168,7 @@ public class ListFileView extends JPanel {
 							FileWriter fw = new FileWriter(saveFilePath);
 							if (!listModel.isEmpty()) {
 								for (int i = 0; i < listModel.size(); i++)
-									fw.write(listModel.get(i)
-											+ System.getProperty("line.separator"));
+									fw.write(listModel.get(i) + System.getProperty("line.separator"));
 							}
 							fw.close();
 						} catch (IOException e1) {
@@ -180,8 +186,7 @@ public class ListFileView extends JPanel {
 				chooser2.setFileSelectionMode(JFileChooser.FILES_ONLY);
 				chooser2.setMultiSelectionEnabled(false);
 				String saveType[] = { "tc" };
-				chooser2.setFileFilter(new FileNameExtensionFilter("tc",
-						saveType));
+				chooser2.setFileFilter(new FileNameExtensionFilter("tc", saveType));
 				int result = chooser2.showOpenDialog(null);
 				BufferedReader br = null;
 				if (result == JFileChooser.APPROVE_OPTION) {
@@ -189,14 +194,12 @@ public class ListFileView extends JPanel {
 						listModel.clear();
 						try {
 							br = new BufferedReader(new InputStreamReader(
-									new FileInputStream(chooser2
-											.getSelectedFile())));
+									new FileInputStream(chooser2.getSelectedFile())));
 						} catch (FileNotFoundException e) {
 							e.printStackTrace();
 						}
 						try {
-							for (String line = br.readLine(); line != null; line = br
-									.readLine()) {
+							for (String line = br.readLine(); line != null; line = br.readLine()) {
 								listModel.addElement(line);
 							}
 						} catch (IOException e) {

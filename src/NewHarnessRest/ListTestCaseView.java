@@ -79,7 +79,7 @@ public class ListTestCaseView extends JPanel {
 			public void actionPerformed(ActionEvent event) {
 				try {
 					new MainUI(jl.getSelectedValue()).init();
-				} catch (IOException e) {					
+				} catch (Throwable e) {					
 					e.printStackTrace();
 				}
 			}
@@ -116,7 +116,7 @@ public class ListTestCaseView extends JPanel {
 			public void actionPerformed(ActionEvent event) {								
 				try {
 					new MainUI("").init();
-				} catch (IOException e) {					
+				} catch (Throwable e) {					
 					e.printStackTrace();
 				}
 			}

@@ -8,15 +8,16 @@ import java.awt.event.ActionEvent;
 import java.awt.event.ActionListener;
 import java.awt.event.MouseAdapter;
 import java.awt.event.MouseEvent;
+import java.io.BufferedReader;
 import java.io.BufferedWriter;
+import java.io.File;
 import java.io.FileNotFoundException;
+import java.io.FileReader;
 import java.io.FileWriter;
 import java.io.IOException;
 import java.io.UnsupportedEncodingException;
-
 import java.text.ParseException;
 import java.util.HashMap;
-
 import java.util.List;
 import java.util.Map;
 
@@ -45,8 +46,9 @@ public class MainUI {
 	String tURL = "";
 	String tempTestCasePath = "";
 	JTextField name;
-	RestRequestView requestView = new RestRequestView();
+	RestRequestView requestView;
 	ParamLibsView libsView;
+	private JSONObject configJSON;
 	private static String seperator = System.getProperty("line.separator");
 	
 	class doubleClick extends MouseAdapter{
@@ -66,6 +68,22 @@ public class MainUI {
 	
 	public MainUI(String tcP){
 		this.tempTestCasePath = tcP;
+		requestView = new RestRequestView();
+	}
+	
+	public MainUI(String tcP, JSONObject config) throws IOException, JSONException{
+		this.tempTestCasePath = tcP;
+		FileReader fr = new FileReader("C:\\Users\\ChengyiSunbird\\Desktop\\config.json"); 
+		String line = null;
+        StringBuffer strBuffer = new StringBuffer();		
+		BufferedReader br = new BufferedReader(fr);
+		while ((line = br.readLine()) != null)
+        {
+            strBuffer.append(line + System.getProperty("line.separator"));
+        }         
+        br.close();
+        this.configJSON = new JSONObject(strBuffer.toString());
+		requestView = new RestRequestView(configJSON);
 	}
 	
 	
@@ -167,6 +185,7 @@ public class MainUI {
 			}	    	
 	    });
 		
+		/*
 		//5
 		libsView.addToRequestButton.addActionListener(new ActionListener(){
 			@Override
@@ -215,6 +234,7 @@ public class MainUI {
 			}	    	
 	    });
 		
+		
 		//7 Set button
 		listFileView.addURLButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {	
@@ -246,6 +266,7 @@ public class MainUI {
 				
 			}
 		});	
+		*/
 		
 		//8
 		requestView.dataButton.addActionListener(new ActionListener()  
@@ -265,7 +286,7 @@ public class MainUI {
             }  
         });
 		
-		
+		/*
 		//9
 		libsView.addToDataButton.addActionListener(new ActionListener(){
 
@@ -293,33 +314,28 @@ public class MainUI {
 			}
 			
 		});
+		*/
 		
 	}
 	
 	
 	
-	public void init() throws IOException{	
+	public void init() throws Throwable{	
 		mainFrame.setExtendedState(Frame.MAXIMIZED_BOTH);
 		mainFrame.setDefaultCloseOperation(JFrame.DISPOSE_ON_CLOSE);
 		if (tempTestCasePath.equals(""))
 			listFileView = new ListFileView();
 		else
 			listFileView = new ListFileView(tempTestCasePath);
+		listFileView.setConfig(configJSON);
+		
 		JSplitPane left = new JSplitPane(JSplitPane.VERTICAL_SPLIT, true, listFileView, new JScrollPane(PropEditView));
 		
 		Box rightBox = new Box(BoxLayout.Y_AXIS);		
 		rightBox.add(new JScrollPane(requestView));
 		
-		try {
-			libsView = new ParamLibsView();
-			rightBox.add(libsView);
-		} catch (InstantiationException e1) {			
-			e1.printStackTrace();
-		} catch (IllegalAccessException e1) {			
-			e1.printStackTrace();
-		} catch (ClassNotFoundException e1) {			
-			e1.printStackTrace();
-		}
+		//libsView = new ParamLibsView();
+		//rightBox.add(libsView);
 		
 		listFileView.getJList().addMouseListener(new doubleClick());
 		JSplitPane leftAndRight = new JSplitPane(JSplitPane.HORIZONTAL_SPLIT, true, left, rightBox);
@@ -329,50 +345,17 @@ public class MainUI {
 		left.setDividerLocation((int)mainFrame.getSize().getHeight()*50/100);
 		getParamsAndProps();
 		setupButtonListeners();
-		try {
-			PropEditView.updateData("");
-		} catch (IOException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-	}
-	
-	public static void _quickSort(List<String> list, int low, int high) {
-		if (low < high) {
-			int middle = getMiddle(list, low, high);  
-			_quickSort(list, low, middle - 1);        
-			_quickSort(list, middle + 1, high);       
-		}
-	}
-
-	private static int getMiddle(List<String> list, int low, int high) {  //treat as String
-		String tmp = list.get(low);    
-		while (low < high) {
-			while (low < high && (list.get(high).compareToIgnoreCase(tmp) >= 0 && list.get(high).length() == tmp.length() || list.get(high).length() > tmp.length())) {
-				high--;
-			}
-			list.set(low, list.get(high));   
-			while (low < high && (list.get(low).compareToIgnoreCase(tmp) < 0 && list.get(low).length() == tmp.length() || list.get(low).length() < tmp.length())) {
-				low++;
-			}
-			list.set(high, list.get(low));   
-		}
-		list.set(low, tmp);              
-		return low;                   
-	}
-	
-	private static void decodeStringList(List<String> rawList) throws UnsupportedEncodingException{
 		
-		for (int i=0; i<rawList.size(); i++)
-			rawList.set(i, java.net.URLDecoder.decode(rawList.get(i), "UTF-8"));
+		PropEditView.updateData("");
 		
 	}
 	
 	
-	public static void main(String[] args) throws FileNotFoundException, IOException, ParseException, JSONException {
-		// TODO Auto-generated method stub		
+	public static void main(String[] args) throws Throwable {
+		// TODO Auto-generated method stub
+		
 		try {
-			new MainUI("").init();
+			new MainUI("", null).init();
 		} catch (IOException e) {			
 			e.printStackTrace();
 		}	

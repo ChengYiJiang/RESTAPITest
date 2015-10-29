@@ -2,7 +2,10 @@ package NewHarnessRest;
 
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
+import java.util.List;
 
+import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
@@ -33,6 +36,52 @@ public class RESTServiceFactory {
 		output.refreshData(rawData);
 		return output;		
 	}
+	
+	public RESTService getService(String serviceName, JSONObject rawData, JSONObject config) {
+		RESTService output = serviceMap.get(serviceName);
+		output.refreshData(rawData);
+		return output;		
+	}
+	
+	public String generateURL(JSONObject r, JSONObject methodConfig) throws JSONException{
+		System.out.println("method is " + r.getString("Method"));
+		System.out.println("config json is: " + methodConfig.toString());
+		JSONObject sv = methodConfig.getJSONObject(r.getString("Method"));
+		if (sv.has("params")){
+			JSONArray paramsList = sv.getJSONArray("params");
+			
+			//List<Object> paramsList = (List<Object>) sv.get("params");
+			StringBuilder sb = new StringBuilder();
+			StringBuilder urlParams = new StringBuilder();
+			for (int i=0; i<paramsList.length(); i++){
+				Object temp = paramsList.get(i);
+				if (temp.toString().startsWith("*--*"))
+					sb.append("/" + r.get(temp.toString().substring(4)).toString());				 
+				else if (temp.toString().startsWith("*__*"))
+					urlParams.append(temp.toString().substring(4) + "=" + r.get(temp.toString().substring(4)).toString() + "&");
+				else
+					sb.append("/" + temp.toString());
+			}
+			String urlParamsString = urlParams.toString();
+			if (urlParamsString.length() > 0)
+				urlParamsString = "?" + urlParamsString.substring(0, urlParamsString.length()-2);			
+			
+			return sb.toString() + urlParamsString;
+		}
+		return null;
+	}
+	
+	public JSONObject parseLeafJSONData(JSONObject response, String httpMethod, JSONObject config) throws JSONException {
+		if (httpMethod.contains("GET"))
+			return null;
+		Object o = config.getJSONObject(httpMethod).get("parseLeaf");
+		if (o == JSONObject.NULL)
+			return response;
+		else
+			return response.getJSONObject(o.toString());
+	}
+	
+	
 }
 
 // external api for item CRUD, cannot search, key param is the item ID

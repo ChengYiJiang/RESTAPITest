@@ -227,8 +227,9 @@ public class beginningUI {
 			new beginningUI().init();		
 		else if (args[0].equals("NGUI")){
 			try{
+			System.out.println("Your jar file path is: " + System.getProperty("user.dir")); 
 			runWithoutGUI(args[1], args[2], args[3]);
-			System.out.println("FINISHED!!!!!!!");
+			//System.out.println("FINISHED!!!!!!!");
 			System.exit(0);
 			} catch (ArrayIndexOutOfBoundsException e){
 				System.out.println("Unfortunately you did something wrong.");

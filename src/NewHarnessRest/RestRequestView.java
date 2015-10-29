@@ -8,8 +8,10 @@ import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Properties;
 
 import javax.swing.Box;
@@ -70,10 +72,14 @@ public class RestRequestView extends JPanel{
 		saveFilePath = s;
 	}
 	
-	public RestRequestView(){		
-		init();
+	public RestRequestView(JSONObject config){		
+		init(config);
 	}
 	
+	public RestRequestView() {
+		init(null);
+	}
+
 	public void addNews(Object[] data){
 		model.addRow(data);
 	}
@@ -167,17 +173,25 @@ public class RestRequestView extends JPanel{
 		jtable.updateUI();
 	}
 	
-	public void init(){		
+	public void init(JSONObject config){		
 		model = new DefaultTableModel(null, headings);		
 		jtable = new MyFileTable(model);		
 		jtable.setPreferredScrollableViewportSize(new Dimension(450, 250));
 		this.updateData(loadFilePath);			
 		
 	    //SETUP THE COMBOBOX FOR METHOD CELL
+		Iterator<String> methodIterator = config.keys();
+		List<String> methodList = new ArrayList<String>();
+		while(methodIterator.hasNext())
+			methodList.add(methodIterator.next());
+		String[] valueSupport = new String[methodList.size()];
+		String[] values = methodList.toArray(valueSupport);
+		/*
 	    String[] values = new String[] { "Item_Post", "Item_Delete", "Item_Get", "Item_Put", 
 	    		"Dataport_Post", "Dataport_Put", "Dataport_Delete", "Dataport_Get","Location_Get", "Location_Put", "Location_Post", "Location_Delete", "Ip_Get", 
 	    		"Ipassignments_Post", "Ipassignments_Delete", "Ipassignments_Put", "Ipassignments_Get", "SmartChart_Post", "MobileSearch_Post"
 	    		, "MobilePlacement_Post"};
+	    		*/
 	    jtable.setComboCell(0, 1, new MyComboBoxEditor(values));
 	   /* jtable.getCellEditor(0, 1).addCellEditorListener(new CellEditorListener() {
 

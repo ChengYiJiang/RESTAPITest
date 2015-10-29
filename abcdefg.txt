@@ -1,0 +1,56 @@
+
+This thread proccessing test case: MobileAutoRegression/TestCaseSet1.tc
+
+-------------------------------------------
+Validation result for C:\Users\ChengyiSunbird\Desktop\RESTHarness\MobileAutoRegression\TestCaseSet1\SearchForChassis1.json:
+search chassis1 and save itemId
+------------------------------------------------------------------------------------
+Group 2 is found and correct
+Group 3 is found and correct
+=============================>>>>>  PASS
+-------------------------------------------
+Validation result for C:\Users\ChengyiSunbird\Desktop\RESTHarness\MobileAutoRegression\TestCaseSet1\GetLocationForChassis1.json:
+
+------------------------------------------------------------------------------------
+Found key-value pair: responseMessage:OK  and value as expected.
+Found key-value pair: responseCode:200  and value as expected.
+Group 1 is found and correct
+=============================>>>>>  PASS
+-------------------------------------------
+Validation result for C:\Users\ChengyiSunbird\Desktop\RESTHarness\MobileAutoRegression\TestCaseSet1\GetCabinetForChassis1.json:
+
+------------------------------------------------------------------------------------
+Found key-value pair: responseMessage:OK  and value as expected.
+Found key-value pair: responseCode:200  and value as expected.
+Group 1 is found and correct
+=============================>>>>>  PASS
+-------------------------------------------
+Validation result for C:\Users\ChengyiSunbird\Desktop\RESTHarness\MobileAutoRegression\TestCaseSet1\GetRailsUsedForChassis1.json:
+
+------------------------------------------------------------------------------------
+Found key-value pair: responseMessage:OK  and value as expected.
+Found key-value pair: responseCode:200  and value as expected.
+Group 1 is found and correct
+=============================>>>>>  PASS
+-------------------------------------------
+Validation result for C:\Users\ChengyiSunbird\Desktop\RESTHarness\MobileAutoRegression\TestCaseSet1\GetUPForChassis1.json:
+
+------------------------------------------------------------------------------------
+Found key-value pair: responseMessage:OK  and value as expected.
+Found key-value pair: responseCode:200  and value as expected.
+Group 1 is found and correct
+=============================>>>>>  PASS
+-------------------------------------------
+Validation result for C:\Users\ChengyiSunbird\Desktop\RESTHarness\MobileAutoRegression\TestCaseSet1\GetOrientationForChassis1.json:
+
+------------------------------------------------------------------------------------
+Found key-value pair: responseMessage:OK  and value as expected.
+Found key-value pair: responseCode:200  and value as expected.
+Group 1 is found and correct
+=============================>>>>>  PASS
+
+
+PASS
+
+
+FAILED CASES (0 of 1) :
