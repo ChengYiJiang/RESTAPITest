@@ -23,8 +23,7 @@ public class MyFileTable extends JTable{
 	}
 
 	@Override
-	public TableCellEditor getCellEditor(int row, int column) {
-		//System.out.println(row + "," + column + ";" + myRow + "," + myCol + "," + myEditor);
+	public TableCellEditor getCellEditor(int row, int column) {		
 		if (this.getValueAt(row, 0).equals("Method") && column == myCol)		
 			return myEditor;
 		return super.getCellEditor(row, column);

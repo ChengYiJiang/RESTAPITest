@@ -5,6 +5,10 @@ import org.json.JSONObject;
 
 import NewHarnessRest.RESTService;
 
+/*
+ * This class will not be used anymore 
+ */
+
 public class MobilePlacementService extends RESTService {
 	
 	public MobilePlacementService() {

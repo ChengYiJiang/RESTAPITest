@@ -12,10 +12,9 @@ public class cookieGetter {
 	public String getCookie(String ip){
 		
 		new SSLVerificationDisabler().disableSslVerification();	
-		
+		//TODO: This admin:raritan should be somehow modified
 		String authString = "admin:raritan";
-		String authStringEnc = new String(Base64.encodeBase64(authString
-				.getBytes()));
+		String authStringEnc = new String(Base64.encodeBase64(authString.getBytes()));
 		try {
 			URL url = new URL(ip);
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();

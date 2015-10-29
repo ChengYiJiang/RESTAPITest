@@ -38,12 +38,10 @@ public class RestPropValidation {
 
 	// r is the response JSONObject, json is the validation JSONObject :<
 	public String[] validateP(JSONObject r, JSONObject json, String path, ConcurrentHashMap<String, String> requestOveride, String d) throws FileNotFoundException, IOException, JSONException {
-		//maxDeepth = 0;
-		correctGroup.clear();
-		//commet here for test only
-		if (requestOveride != null)
-			overideProps.putAll(requestOveride);
 		
+		correctGroup.clear();		
+		if (requestOveride != null)
+			overideProps.putAll(requestOveride);		
 		
 		Iterator<String> preCheck = json.keys();
 		while (preCheck.hasNext()) {
@@ -51,8 +49,7 @@ public class RestPropValidation {
 			if (!temp.equals("0")) {
 				checkGroup.put(temp, new ArrayList<String>());
 			}
-		}
-		
+		}		
 
 		result[0] = seperator + "-------------------------------------------" + seperator + "Validation result for " + path + ":" + seperator + d + seperator + "-----------------------------------------" + "-------------------------------------------";
 		result[1] = "PASS";
@@ -86,8 +83,7 @@ public class RestPropValidation {
 
 	// vSub is the JSONObject with key group id. it only contains levels!!!
 	public void searchGroupingValidation(JSONObject r, JSONObject vSub, String vKey, int offset) throws JSONException {
-		boolean result = true;
-		
+		boolean result = true;		
 		//sizeOfV = vSub.
 		//System.out.println("maxDeepth is: " + maxDeepth);
 		String levelOne = "";
@@ -103,9 +99,8 @@ public class RestPropValidation {
 				//System.out.println("VERIFY in vSub: " + vSub);
 				levelOne = bigKey;
 			}
-		}
+		}		
 		
-		// Pair<String, String> p = new
 		if (vSub.has(levelOne)) { 
 			JSONObject temp = vSub.getJSONObject(levelOne); // json
 			Iterator<String> groupIter = temp.keys(); // in group that (id -
@@ -117,7 +112,7 @@ public class RestPropValidation {
 				//System.out.println("The key in grouping level map is " + key1 + " and now offset is "+offset + " now maxDeepth is " + maxDeepth);
 
 				if (r.has(key1)) {
-					System.out.println("Found key " + key1 + " and the value is " + r.get(key1));
+					//System.out.println("Found key " + key1 + " and the value is " + r.get(key1));
 					//System.out.println("HERE RESPONSE IS: " + r); 
 					if (r.get(key1) instanceof String || r.get(key1) instanceof Integer || JSONObject.NULL.equals(r.get(key1)) ) {
 						System.out.println("And key in response is a string with data " + r.get(key1));
@@ -152,8 +147,8 @@ public class RestPropValidation {
 						}
 					
 					} else { // key good but value is not a string
-						System.out.println("Now we like do as toString() and compare whole string");
-						System.out.println("In Validation JSON the value should be " + temp.get(key1).toString());
+						//System.out.println("Now we like do as toString() and compare whole string");
+						//System.out.println("In Validation JSON the value should be " + temp.get(key1).toString());
 						if (!r.get(key1).toString().contains(temp.get(key1).toString())){	
 							//System.out.println("--------------------------------------");
 							result = false;			
@@ -231,7 +226,7 @@ public class RestPropValidation {
 				// so we do not support override function for this case
 				String toStringValue = String.valueOf(array.get(i));
 				// JSONObject temp = new JSONObject(toStringValue);
-				System.out.println("tostringvalue is here!!!!!!!!!!!! with key is " + key + " and index " + i + " value is " + toStringValue);
+				//System.out.println("tostringvalue is here with key is " + key + " and index " + i + " value is " + toStringValue);
 				// }
 				if (v.has("0") && v.getJSONObject("0").has(key) && toStringValue.equals(v.getJSONObject("0").get(key).toString())) {
 					v.getJSONObject("0").remove(key);
@@ -263,40 +258,25 @@ public class RestPropValidation {
 				//System.out.println("The response here is: " + r);
 				//System.out.println("In corr() the maxDeepthInValidation is " + maxDeepthInValidation);
 				//System.out.println("And now the maxDeepth = " + maxDeepth);
-				/*
-				if (searchGroupingValidation(r, v.getJSONObject(vKey), 0)) { // IMPORTANT
-					System.out.println("GROUP: " + vKey + " IS GOOD GOOD GODD!!1 WHY!");
-					correctGroup.add(vKey);
-				}
-				*/
+				
 				searchGroupingValidation(r, v.getJSONObject(vKey), vKey, 0);
 				if (checkGroup.get(vKey).size() == v.getJSONObject(vKey).length()){
 					System.out.println("GROUP: " + vKey + " IS GOOD!");
 					correctGroup.add(vKey);
-				}
-				/*if (searchGroupingValidation(r, v.getJSONObject(vKey), vKey, 0, new ArrayList<String>()) && maxDeepth >= maxDeepthInValidation) { // IMPORTANT
-					System.out.println("GROUP: " + vKey + " IS GOOD!");
-					correctGroup.add(vKey);
-				}*/
-				
-			//}
-				// System.out.println("Found group " + vKey +
-				// " And they are correct"); // HERE!!!
+				}			
+				// System.out.println("Found group " + vKey + " And they are correct"); 
 				
 
 				// TODO: PRINT GROUP DETAILS MAY BE NOT
 			}
 		}
 
-		// now let's go for group 0
-		//System.out.println("now let's go for group 0");
-
+		// now let's go for group 0	
 		Iterator<String> responseIterator = r.keys();
 		while (responseIterator.hasNext()) {
 
 			String key = responseIterator.next();
-			// System.out.println("now start searching a pair in group 0 with the key "
-			// + key);
+			// System.out.println("now start searching a pair in group 0 with the key " + key);
 			Object o = r.get(key);
 			String toStringValue = null;
 			if (o instanceof JSONObject) { // reversal
@@ -307,20 +287,13 @@ public class RestPropValidation {
 				JSONArray tmp = (JSONArray) o;
 				corrArray(tmp, v, key); // now using another recursive function
 
-				/*
-				 * for (int i = 0; i < tmp.length(); i++){ if (tmp.get(i)
-				 * instanceof JSONObject) corr(tmp.getJSONObject(i), v); //if
-				 * (tmp.get(i) instanceof JSONArray) //TODO: HERE!!!!!!!!! }
-				 */
 			} else if (o instanceof List<?>) {  //TODO: should not check like this
 				//toStringValue = String.valueOf(((List) o).get(0));
 				//TODO: FOR HERE MAYBE IMPLEMENT toString() || contains()
 				//TODO: FOR HERE MAYBE IMPLEMENT get(index)
 				//System.out.println("Key is " + key + " which get an List<?>");
 				//System.out.println("tostringvalue ArrayList[0] is " + ((List<?>) o).toString());
-			} else {// if (o instanceof String || o instanceof Integer ) {
-					// from response
-
+			} else {// if (o instanceof String || o instanceof Integer ) {					
 				// if (o instanceof Integer) {
 				//System.out.println("Key is " + key + " which get an String/Integer/Long/NULL");
 				toStringValue = String.valueOf(o);
@@ -354,6 +327,7 @@ public class RestPropValidation {
 		}
 	}
 	
+	//TODO: validate as String
 	private void validateToString(){
 		
 	}

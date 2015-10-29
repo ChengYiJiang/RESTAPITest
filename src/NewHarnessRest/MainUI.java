@@ -40,14 +40,14 @@ import org.json.JSONObject;
 public class MainUI {	
 	
 	private JFrame mainFrame = new JFrame("Test Case Viewer");		
-	PropertiesView PropEditView = new PropertiesView();
-	ListFileView listFileView;
-	JPopupMenu popupMenu = new JPopupMenu();
-	String tURL = "";
-	String tempTestCasePath = "";
-	JTextField name;
-	RestRequestView requestView;
-	ParamLibsView libsView;
+	private PropertiesView PropEditView = new PropertiesView();
+	private ListFileView listFileView;
+	private JPopupMenu popupMenu = new JPopupMenu();
+	private String tURL = "";
+	private String tempTestCasePath = "";
+	private JTextField name;
+	private RestRequestView requestView;
+	private ParamLibsView libsView;
 	private JSONObject configJSON;
 	private static String seperator = System.getProperty("line.separator");
 	
@@ -73,9 +73,10 @@ public class MainUI {
 	
 	public MainUI(String tcP, JSONObject config) throws IOException, JSONException{
 		this.tempTestCasePath = tcP;
-		System.out.println("Your jar file path is: " + System.getProperty("user.dir"));
-		//FileReader fr = new FileReader(System.getProperty("user.dir") + "\\config.json");
-		FileReader fr = new FileReader("C:\\Users\\ChengyiSunbird\\Desktop\\config.json"); 
+		
+		//MAKE SURE YOUR JAR FILE AND CONFIG FILE IS IN SAME FOLDER
+		FileReader fr = new FileReader(System.getProperty("user.dir") + "\\config.json");
+		
 		String line = null;
         StringBuffer strBuffer = new StringBuffer();		
 		BufferedReader br = new BufferedReader(fr);
@@ -110,8 +111,7 @@ public class MainUI {
             	//System.out.println("it is "+s);
             	JFileChooser chooser = new JFileChooser(".");
             	String saveType[] = { "json" };
-				chooser.setFileFilter(new FileNameExtensionFilter("Test Step",
-						saveType));
+				chooser.setFileFilter(new FileNameExtensionFilter("Test Step", saveType));
 				int result = chooser.showSaveDialog(null);
 				
 				if (result == JFileChooser.APPROVE_OPTION) {					
@@ -316,11 +316,8 @@ public class MainUI {
 			}
 			
 		});
-		*/
-		
+		*/		
 	}
-	
-	
 	
 	public void init() throws Throwable{	
 		mainFrame.setExtendedState(Frame.MAXIMIZED_BOTH);
@@ -353,9 +350,7 @@ public class MainUI {
 	}
 	
 	
-	public static void main(String[] args) throws Throwable {
-		// TODO Auto-generated method stub
-		
+	public static void main(String[] args) throws Throwable {		
 		try {
 			new MainUI("", null).init();
 		} catch (IOException e) {			

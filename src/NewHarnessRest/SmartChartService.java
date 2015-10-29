@@ -3,6 +3,11 @@ package NewHarnessRest;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+
+/*
+ * This class will not be used anymore 
+ */
+
 public class SmartChartService extends RESTService{
 	
 	public SmartChartService() {

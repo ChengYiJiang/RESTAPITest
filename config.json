@@ -1,0 +1,32 @@
+{
+	"SmartChart_Post":
+	{
+		"params":
+		[
+			"measurements"
+		],
+		"parseLeaf":null		
+	},
+	"MobileSearch_Post":
+	{
+		"params":
+		[
+			"mobile",
+			"search",
+			"*--*searchType"
+		],
+		"parseLeaf":null		
+	},
+	"MobilePlacement_Post":
+	{
+		"params":
+		[
+			"mobile",
+			"getavailable",
+			"position",
+			"*--*modelId",
+			"*__*itemId"
+		],
+		"parseLeaf":null		
+	}
+}

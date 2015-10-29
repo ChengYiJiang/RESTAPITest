@@ -29,10 +29,6 @@ import org.json.*;
 
 public class RestRequestView extends JPanel{
 
-	/**
-	 * @param args
-	 */
-	
 	private String url = "";
 	private MyFileTable jtable;
 	private JSONObject jo;

@@ -91,19 +91,18 @@ public class JSONViewer extends JPanel implements ActionListener,
 	private String[] columnNames = { "Key", "Value" };
 	private Object[][] data = new Object[0][];
 	private Font font = new Font("Consolas", Font.BOLD, 15);
-	private JLabel status;
-	private String saveFilePath;
-	public RestRequestView fromMain;
+	private JLabel status;	
+	public RestRequestView fromMain;  //reference to data passed from mainUI by button "Data"
 	
 
 	
-	public JSONViewer(RestRequestView jsonData) {
-		this.fromMain = jsonData;
+	public JSONViewer(RestRequestView restRequestView) {
+		this.fromMain = restRequestView;
 		setLayout(new BorderLayout());
 		setSize(800, 600);		
 		this.add (makeTab(), BorderLayout.CENTER);
 		this.add (makeStatus(), BorderLayout.SOUTH);		
-		textArea.setText(jsonData.getRawJSONData().toString());		
+		textArea.setText(restRequestView.getRawJSONData().toString());		
 	}
 	
 
@@ -113,8 +112,7 @@ public class JSONViewer extends JPanel implements ActionListener,
 		ScriptEngine se = sem.getEngineByName("js");
 		try {
 			status.setForeground(Color.GREEN);
-			status.setText("Success Parse JSON");
-			
+			status.setText("Success Parse JSON");			
 			return (IdScriptableObject) se.eval(jsonstr);
 		} catch (Exception e) {
 			status.setForeground(Color.RED);
@@ -150,19 +148,15 @@ public class JSONViewer extends JPanel implements ActionListener,
 					object = "null";
 				} else if (object instanceof NativeFunction) {
 					object = ((NativeFunction) (object)).getEncodedSource();
-					object = Decompiler.decompile(object.toString(), -1,
-							new UintMap());
-					object = object.toString().replaceAll("^\\((.*)\\)$", "$1")
-							.replaceAll("\"", "\'");
+					object = Decompiler.decompile(object.toString(), -1, new UintMap());
+					object = object.toString().replaceAll("^\\((.*)\\)$", "$1").replaceAll("\"", "\'");
 				}
 				if (param.matches("^[\\d+\\.]+$")) {
-					object = ((IdScriptableObject) (obj)).get(
-							Integer.parseInt(param), null);
+					object = ((IdScriptableObject) (obj)).get(Integer.parseInt(param), null);
 				}
 				String value = object.toString().replaceAll("^(.+)\\.0$", "$1");
 				String val = "";
-				if (!(object instanceof NativeArray)
-						&& !(object instanceof NativeObject)) {
+				if (!(object instanceof NativeArray) && !(object instanceof NativeObject)) {
 					val = param + ": \"" + value + "\"";
 				} else {
 					val = param;
@@ -184,13 +178,11 @@ public class JSONViewer extends JPanel implements ActionListener,
 					object = ((NativeFunction) (object)).getEncodedSource();
 					object = Decompiler.decompile(object.toString(), -1,
 							new UintMap());
-					object = object.toString().replaceAll("^\\((.*)\\)$", "$1")
-							.replaceAll("\"", "\'");
+					object = object.toString().replaceAll("^\\((.*)\\)$", "$1").replaceAll("\"", "\'");
 				}
 				String value = object.toString().replaceAll("^(.+)\\.0$", "$1");
 				String val = "";
-				if (!(object instanceof NativeArray)
-						&& !(object instanceof NativeObject)) {
+				if (!(object instanceof NativeArray) && !(object instanceof NativeObject)) {
 					val = i + ": \"" + value + "\"";
 				} else {
 					val = i + "";
@@ -206,8 +198,7 @@ public class JSONViewer extends JPanel implements ActionListener,
 		treeModel = new DefaultTreeModel(rootNode);
 		tree = new JTree(treeModel);
 		tree.addTreeSelectionListener(this);
-		tree.getSelectionModel().setSelectionMode(
-				TreeSelectionModel.SINGLE_TREE_SELECTION);
+		tree.getSelectionModel().setSelectionMode(TreeSelectionModel.SINGLE_TREE_SELECTION);
 		tree.setShowsRootHandles(true);
 		tree.setRootVisible(false);
 		tree.setFont(font);
@@ -273,11 +264,9 @@ public class JSONViewer extends JPanel implements ActionListener,
 		JButton clear = new JButton(CLEAR);
 		clear.addActionListener(this);
 		bar.add(clear);
-		JButton save = new JButton(SAVE);
+		JButton save = new JButton(SAVE);		
 		
-		
-		
-		//TODO HERE IS BUG!!!!!!!!!!!!!!!!
+		//save the data into part of the testStep JSON in mainUI
 		save.addActionListener(new ActionListener(){
 			@Override
 			public void actionPerformed(ActionEvent e) {
@@ -505,8 +494,7 @@ public class JSONViewer extends JPanel implements ActionListener,
 				for (int i = 0; i < level; i++) {
 					temp += "\t";
 				}
-				String x = isObject ? "\"" + k + "\":" + LINE + temp + "{"
-						: "{";
+				String x = isObject ? "\"" + k + "\":" + LINE + temp + "{" : "{";
 				textArea.append(x + LINE);
 			} else {
 				String x = "";
@@ -529,10 +517,8 @@ public class JSONViewer extends JPanel implements ActionListener,
 					object = null;
 				} else if (object instanceof NativeFunction) {
 					object = ((NativeFunction) (object)).getEncodedSource();
-					object = Decompiler.decompile(object.toString(), -1,
-							new UintMap());
-					object = object.toString().replaceAll("^\\((.*)\\)$", "$1")
-							.replaceAll("\"", "\'");
+					object = Decompiler.decompile(object.toString(), -1, new UintMap());
+					object = object.toString().replaceAll("^\\((.*)\\)$", "$1").replaceAll("\"", "\'");
 				}
 				if (key.matches("^[\\d+\\.]+$")) {
 					object = ((IdScriptableObject) (obj)).get(
@@ -546,8 +532,7 @@ public class JSONViewer extends JPanel implements ActionListener,
 					value = null;
 					*/
 				Object value = object;
-				formatJSON(object, lev, key, value, true, i == len - 1,
-						isDeletedSpace, isDeleteAndCont);
+				formatJSON(object, lev, key, value, true, i == len - 1, isDeletedSpace, isDeleteAndCont);
 			}
 			if (!isDeletedSpace) {
 				for (int i = 0; i < level; i++) {
@@ -572,8 +557,7 @@ public class JSONViewer extends JPanel implements ActionListener,
 				for (int i = 0; i < level; i++) {
 					temp += "\t";
 				}
-				String x = isObject ? "\"" + k + "\":" + LINE + temp + "["
-						: "[";
+				String x = isObject ? "\"" + k + "\":" + LINE + temp + "[" : "[";
 				textArea.append(x + LINE);
 			} else {
 				String x = "";
@@ -596,18 +580,15 @@ public class JSONViewer extends JPanel implements ActionListener,
 					object = null;
 				} else if (object instanceof NativeFunction) {
 					object = ((NativeFunction) (object)).getEncodedSource();
-					object = Decompiler.decompile(object.toString(), -1,
-							new UintMap());
-					object = object.toString().replaceAll("^\\((.*)\\)$", "$1")
-							.replaceAll("\"", "\'");
+					object = Decompiler.decompile(object.toString(), -1, new UintMap());
+					object = object.toString().replaceAll("^\\((.*)\\)$", "$1").replaceAll("\"", "\'");
 				}
 				String value = null;
 				if (object != null)
 					value = object.toString().replaceAll("^(.+)\\.0$", "$1");
 				else
 					value = null;
-				formatJSON(object, lev, i + "", value, false, i == len - 1,
-						isDeletedSpace, isDeleteAndCont);
+				formatJSON(object, lev, i + "", value, false, i == len - 1, isDeletedSpace, isDeleteAndCont);
 			}
 			if (!isDeletedSpace) {
 				for (int i = 0; i < level; i++) {
@@ -659,12 +640,9 @@ public class JSONViewer extends JPanel implements ActionListener,
 				}
 			} else {  //modify here for null Object				
 				if (!isDeleteAndCont) {
-					vv = isObject ? ("\"" + k + "\": null")
-							: ("null");
-					System.out.println("here1");
+					vv = isObject ? ("\"" + k + "\": null") : ("null");					
 				} else {
-					vv = isObject ? ("\\\"" + k + "\\\": null")	: ("null");
-					System.out.println("here2");
+					vv = isObject ? ("\\\"" + k + "\\\": null")	: ("null");					
 				}				
 				vv = isLast ? vv : vv + ",";
 				if (!isDeletedSpace) {

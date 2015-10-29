@@ -47,8 +47,7 @@ public class ListFileView extends JPanel {
 	
 	public void setConfig(JSONObject config){
 		this.config = config;
-	}
-	
+	}	
 	
 	public ListFileView() {
 		init();
@@ -56,8 +55,7 @@ public class ListFileView extends JPanel {
 
 	public ListFileView(String fP) throws IOException {
 		if (!fP.equals("")) {
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-					new FileInputStream(fP)));
+			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(fP)));
 			for (String line = br.readLine(); line != null; line = br.readLine()) {
 				listModel.addElement(line);
 			}

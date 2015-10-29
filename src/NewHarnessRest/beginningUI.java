@@ -38,50 +38,44 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class beginningUI {
-	static String seperator = System.getProperty("line.separator");
-	JTextField name = new JTextField(35);
+	private static String seperator = System.getProperty("line.separator");
+	private JTextField name = new JTextField(35);
 	private static String errMsg = "How to use: " + seperator +
 	"1. You need JDK" + seperator +
-	"2. In commend line cd to where the SoapTestTool.jar is located, you can launch the programe with or without GUI:"
+	"2. In commend line cd to where the .jar is located, you can launch the programe with or without GUI:"
 	+ seperator + 
 		"java -jar RESTHarness.jar GUI" + seperator +
-		"java -jar RESTHarness.jar NGUI <folder of your test cases> <your target IP address> <your target report file path>"
+		"java -jar RESTHarness.jar NGUI <folder of your test cases> <your target IP address> <your target report file path> <your path of config JSON>"
 		+ seperator + 
-		"For example:" + seperator +
-		"java -jar RESTHarness.jar NGUI C:\\Users\\MyName\\TestCases 192.168.62.111 report.txt";
+		"For example in windows:" + seperator +
+		"java -jar RESTHarness.jar NGUI C:\\Users\\MyName\\TestCases 192.168.62.111 report.txt C:\\Users\\MyName\\config.json";
 	
 	private String targetU = "";
 	private JFrame jf = new JFrame("RestHarness");
-	ListTestCaseView tcView = new ListTestCaseView();
+	private ListTestCaseView tcView = new ListTestCaseView();
 	public static JTextArea ta;
 	public static ArrayList<String> FailedResult = new ArrayList<String>();
-	private int numOfT = 5;
-	String textToShow = "";
+	private static int numOfT = 5;
+	private String textToShow = "";
 	private String sessionID = "";
 	
 	private JFileChooser chooser = new JFileChooser(".");
 	private String saveType[] = {"txt"};
 	
 	
-	
-	
 	public void init(){		
 		JPanel setPanel = new JPanel();		
-		name.setText("Please input your target IP address");
-		//name.setText("https://192.168.62.187/api/v1");
+		name.setText("Please input your target IP address");	
 		setPanel.add(name, BorderLayout.NORTH);
 		JButton addURLButton = new JButton("Set");
 		addURLButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				String temp = name.getText();
 				if (temp.startsWith("https://")){
-					targetU = name.getText() + "/";
-					sessionID = new cookieGetter().getCookie(temp);
+					targetU = name.getText() + "/";					
 				}else{
-					targetU = "https://" + name.getText() + "/";	
-					sessionID = new cookieGetter().getCookie("https://" + temp);
-				}
-				System.out.println("session id is "+sessionID);
+					targetU = "https://" + name.getText() + "/";
+				}				
 				tcView.setTargetURL(targetU);
 			}
 		});		
@@ -98,27 +92,20 @@ public class beginningUI {
 		ta.setBorder(BorderFactory.createEtchedBorder());
 		upAndDown.add(new JScrollPane(ta));
 		JPanel numOfThreadPane = new JPanel();
-		//final JFormattedTextField numOfThread = new JFormattedTextField(NumberFormat.getIntegerInstance());		
-		//numOfThread.setColumns(4);
-		//numOfThread.getv
+		
 		JButton setnumOfThreadButton = new JButton("Run");
-		
-		
 		
 		setnumOfThreadButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				FailedResult.clear();
-				JList jl = tcView.getJList();
-				int numOfT = 5;
-				int size = jl.getSelectedValuesList().size();
-				ArrayList<String[]> toSee;
+				JList jl = tcView.getJList();				
+				int size = jl.getSelectedValuesList().size();				
 				CountDownLatch latch = new CountDownLatch(size);
 				ta.append("Let's start testing " + size +" cases......");
 				new SSLVerificationDisabler().disableSslVerification();
 				ExecutorService pool = Executors.newCachedThreadPool();
 				RestRunnerWatcher boss = new RestRunnerWatcher(latch, ta, FailedResult, size);
-				pool.execute(boss);
-				//String targetUrlS = 
+				pool.execute(boss);				
 				for (int i = 0; i < jl.getSelectedValuesList().size(); i++) {
 					pool.execute(new Thread(new RestRun(jl.getSelectedValuesList().get(i).toString(), targetU, ta, FailedResult, latch, false, false, sessionID)));
 					System.out.println(targetU);
@@ -143,12 +130,10 @@ public class beginningUI {
 							saveFilePath += ".txt";
 						FileWriter fw = new FileWriter(saveFilePath);
 						if (fw != null){
-								fw.append(ta.getText());
-								fw.flush();
-								fw.close();
-						}else{							
-							fw.write(ta.getText());
-						}						
+							fw.append(ta.getText());
+							fw.flush();
+							fw.close();
+						}					
 					} catch (IOException e1) {						
 						e1.printStackTrace();
 					}
@@ -164,7 +149,6 @@ public class beginningUI {
 			}
 		});
 		
-		//numOfThreadPane.add(numOfThread);
 		numOfThreadPane.add(setnumOfThreadButton);
 		numOfThreadPane.add(saveReportButton);
 		numOfThreadPane.add(refreshButton);
@@ -178,7 +162,7 @@ public class beginningUI {
 	
 	
 	public static void runWithoutGUI(String folderPath, String ip, String reportPath, JSONObject config) throws InterruptedException, ExecutionException{
-		//new SSLVerificationDisabler().disableSslVerification();
+		
 		File folder = new File(folderPath);
 		String[] fList = folder.list();
 		List<String> toRun = new ArrayList<String>();
@@ -186,7 +170,8 @@ public class beginningUI {
 			if (fList[i].endsWith(".tc"))
 				toRun.add(folderPath+"/"+fList[i]);
 		}
-		ArrayList<String[]> result = new MultiThreadRest(toRun, "https://"+ ip, 5, false, false, config).runTestCases(toRun);
+		//TODO: numOfT:5 is a hardcode number of threads to be launched
+		ArrayList<String[]> result = new MultiThreadRest(toRun, "https://"+ ip, numOfT, false, false, config).runTestCases(toRun);
 		ArrayList<String> failList = new ArrayList<String>(); 
 		
 		String r = "";
@@ -197,8 +182,7 @@ public class beginningUI {
 			if (result.get(i)[1].equals("FAILED")){
 				failList.add(result.get(i)[2]);
 			}
-		}
-		//System.out.println("texttoShow is "+textToShow);
+		}		
 		
 		String sum = "FAILED CASES (" + failList.size() + " of " + result.size() + ") :" + seperator;
 		for (int i=0; i<failList.size(); i++){
@@ -225,8 +209,6 @@ public class beginningUI {
 	
 	public static void main(String[] args) throws Throwable {
 		// TODO Auto-generated method stub
-		//new beginningUI().init();
-		
 		if (args.length == 0)
 			new beginningUI().init();
 		else if (args[0].equals("GUI"))
@@ -245,7 +227,7 @@ public class beginningUI {
 	        }         
 	        br.close();	       
 			runWithoutGUI(args[1], args[2], args[3], new JSONObject(strBuffer.toString()) );
-			//System.out.println("FINISHED!!!!!!!");
+			
 			System.exit(0);
 			} catch (ArrayIndexOutOfBoundsException e){
 				System.out.println("Unfortunately you did something wrong.");

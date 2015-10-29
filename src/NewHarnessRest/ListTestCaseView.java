@@ -115,7 +115,7 @@ public class ListTestCaseView extends JPanel {
 		createTCButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {								
 				try {
-					new MainUI("",null).init();
+					new MainUI("", null).init();
 				} catch (Throwable e) {					
 					e.printStackTrace();
 				}

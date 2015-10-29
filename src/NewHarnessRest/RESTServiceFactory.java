@@ -14,43 +14,15 @@ import services.mobile.MobileSearchService;
 
 public class RESTServiceFactory {
 
-	HashMap<String, RESTService> serviceMap;
-
 	public RESTServiceFactory() {
-		this.serviceMap = new HashMap<String, RESTService>();
-		// adding the services
-		serviceMap.put("Item", new itemService());
-		serviceMap.put("Dataport", new dataportsService());
-		serviceMap.put("Location", new locationService());
-		serviceMap.put("Ip", new ipService());
-		serviceMap.put("Ipassignments", new IpassignmentsService());
-		serviceMap.put("SmartChart", new SmartChartService());
-		serviceMap.put("MobileSearch", new MobileSearchService());
-		serviceMap.put("MobilePlacement", new MobilePlacementService());
-		//serviceMap.put("Location", value)
-	}
-
-	// service object refresh every time before a step is passed in
-	public RESTService getService(String serviceName, JSONObject rawData) {
-		RESTService output = serviceMap.get(serviceName);
-		output.refreshData(rawData);
-		return output;		
+		
 	}
 	
-	public RESTService getService(String serviceName, JSONObject rawData, JSONObject config) {
-		RESTService output = serviceMap.get(serviceName);
-		output.refreshData(rawData);
-		return output;		
-	}
-	
-	public String generateURL(JSONObject r, JSONObject methodConfig) throws JSONException{
-		System.out.println("method is " + r.getString("Method"));
-		System.out.println("config json is: " + methodConfig.toString());
+	//This is the rule to generateURL from config file
+	public String generateURL(JSONObject r, JSONObject methodConfig) throws JSONException{		
 		JSONObject sv = methodConfig.getJSONObject(r.getString("Method"));
 		if (sv.has("params")){
 			JSONArray paramsList = sv.getJSONArray("params");
-			
-			//List<Object> paramsList = (List<Object>) sv.get("params");
 			StringBuilder sb = new StringBuilder();
 			StringBuilder urlParams = new StringBuilder();
 			for (int i=0; i<paramsList.length(); i++){
@@ -83,6 +55,15 @@ public class RESTServiceFactory {
 	
 	
 }
+
+
+/*
+ * All classes below will not be used anymore
+ * Leave them there to my life easier in future when I need to make them as config file
+ */
+
+
+/*
 
 // external api for item CRUD, cannot search, key param is the item ID
 class itemService extends RESTService {
@@ -340,3 +321,4 @@ class IpassignmentsService extends RESTService {
 		return null;
 	}
 }
+*/

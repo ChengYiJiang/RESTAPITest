@@ -44,56 +44,47 @@ public class RestRun implements Runnable {
 	public JTextArea jta; // THIS IS THE GUI COMPONENT THE THREAD WILL APPEND RESULT AT
 	public List<String> FailedRecord;
 	private CountDownLatch downLatch;
-	String sourcePath = "";
+	private String sourcePath = "";
 	private String targetURL = "";
-	JSONObject inTC;
-	List<JSONObject> steps; // incoming steps
-	ConcurrentHashMap<String, String> requestOveride = new ConcurrentHashMap<String, String>();
+	private JSONObject inTC;
+	private List<JSONObject> steps; // incoming steps
+	private ConcurrentHashMap<String, String> requestOveride = new ConcurrentHashMap<String, String>();
 	private List<String> fileLocList;
-	String[] validateResult = { "", "PASS", "" };
-	RestPropValidation vObj = new RestPropValidation();
-	String description = "";
-	RESTServiceFactory factory = new RESTServiceFactory();
+	private String[] validateResult = { "", "PASS", "" };
+	private RestPropValidation vObj = new RestPropValidation();
+	private String description = "";
+	private RESTServiceFactory factory = new RESTServiceFactory();
 	private boolean requestShow = false;
 	private boolean responseShow = false;
 	private String _sessionID = "";
-	JSONObject config;
+	private JSONObject config;
 
 	private enum mType {
 		Post, Delete, Get, Put
 	}
-
-	// TODO: COOKIES HANDLER!!!! MAYBE ADDED HERE OR AT OUTSIDE ==> FOR EACH
-	// STEP OR FOR EACH TEST CASE OR FOR EACH EXECUTION
 
 	static String readFile(String path, Charset encoding) throws IOException {
 		byte[] encoded = Files.readAllBytes(Paths.get(path));
 		return new String(encoded, encoding);
 	}
 
-	public RestRun(String tcPath, String turl, JTextArea t, List<String> a,
-			CountDownLatch l, boolean request, boolean response, String ssID) {
+	public RestRun(String tcPath, String turl, JTextArea t, List<String> a, CountDownLatch l, boolean request, boolean response, String ssID) {
 		fileLocList = new ArrayList<String>();
 		_sessionID = ssID;
 		try {
-			BufferedReader br = new BufferedReader(new InputStreamReader(
-					new FileInputStream(tcPath)));
-			for (String line = br.readLine(); line != null; line = br
-					.readLine()) {
-				if (!line.equals("\n") && !line.equals("\r\n")
-						&& !line.equals(""))
+			BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(tcPath)));
+			for (String line = br.readLine(); line != null; line = br.readLine()) {
+				if (!line.equals("\n") && !line.equals("\r\n") && !line.equals(""))
 					fileLocList.add(line.trim());
 			}
 		} catch (FileNotFoundException e) {
 			e.printStackTrace();
-
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
 		this.targetURL = turl;		
 		this.sourcePath = tcPath;
-		this.validateResult[0] = seperator + seperator
-				+ "This thread proccessing test case: " + sourcePath;
+		this.validateResult[0] = seperator + seperator + "This thread proccessing test case: " + sourcePath;
 		this.validateResult[2] = sourcePath;
 		this.jta = t;
 		this.FailedRecord = a;
@@ -103,7 +94,7 @@ public class RestRun implements Runnable {
 	}
 
 	public RestRun(String turl, JTextArea t, List<String> steps, boolean request, boolean response, JSONObject config) {
-		fileLocList = steps;
+		this.fileLocList = steps;
 		this.targetURL = turl;
 		this.jta = t;
 		this.requestShow = request;
@@ -111,8 +102,7 @@ public class RestRun implements Runnable {
 		this.config = config;
 	}
 
-	// for overide  //  should be used to process the whole JSON and then...
-	//TODO !!!
+	// for overide params	
 	private void overideParam(JSONObject obj) throws JSONException {
 		Iterator<String> keys = obj.keys();
 		while(keys.hasNext()){
@@ -120,15 +110,10 @@ public class RestRun implements Runnable {
 			if (obj.get(key) instanceof String){
 				if (obj.get(key).toString().startsWith("**OverideRead")) {
 					String varName = obj.get(key).toString().split("_")[1];
-					if (vObj.getOverideHM().containsKey(varName)){
-						//obj.remove(key);
-						//use iterator.remove
-						//keys.remove();
+					if (vObj.getOverideHM().containsKey(varName)){						
 						obj.put(key, vObj.getOverideHM().get(varName));
 					}						
-					else{
-						//obj.remove(key);
-						//keys.remove();
+					else{						
 						obj.put(key, "No Variable overided!");
 					}						
 				}
@@ -146,50 +131,42 @@ public class RestRun implements Runnable {
 		
 	}
 
-	// return JSONObject[3], [0] is request, [1] is the JSONObject for params
-	// validation, [2] is the response JSON
+	// return JSONObject[3], [0] is request, [1] is the JSONObject for params validation, [2] is the response JSON
 	public JSONObject[] sendReqeust(JSONObject r, JSONObject config) throws Throwable {
-
-		//String service = ""; // for the very beginning step to get the response
-								// payload
 		// start reading json
 		JSONObject[] result = new JSONObject[3];
 		
 		boolean isGet = false;
 		String URL = null;
 		if (r.has("url"))
-				 URL = r.getString("url");
+			URL = r.getString("url");
 		JSONObject jsonV = r.getJSONObject("validation");
 		// description for future use
 		description = r.getString("Description");
 		r.remove("Description");
 		result[1] = (JSONObject) r.remove("validation");
 		// System.out.println("the validation is "+result[1].toString());
-		result[0] = r; // now r contains "id"
+		result[0] = r; 
 		
-		System.out.println("THe request before overide is " + r.toString());
+		//System.out.println("THe request before overide is " + r.toString());
 		overideParam(r);		
 		//now r has been overided
-		System.out.println("THe request after overide is " + r.toString());
+		//System.out.println("THe request after overide is " + r.toString());
 		String Method = "";
 		JSONObject json = new JSONObject(r.toString());
-		//json.get("Method").
+		
 		String method[] = json.get("Method").toString().split("_");
 		
 		//---------------------------
-		//NOW METHOD IS STILL IN THE JSON AND FOR SERVICE TO PROCESS LIKE GENERATE THE URL
-		//json.remove("Method");
+		//NOW METHOD IS STILL IN THE JSON AND FOR SERVICE TO PROCESS LIKE GENERATE THE URL		
 		// Now for overide params in request body:
 		// Iterator all key - value and if the value starts with **Overide
-		// Then replace from HashMap
+		// Then replace from HashMap		
 		
-		//TODO!!!!!  REVERSE JSONrawData and replace all Overide
-		//MAYBE USE FUNCTION ABOVE
 		Iterator<String> keys = json.keys();
 		while (keys.hasNext() && requestOveride.size() > 0) {
 			String key = keys.next();
-			if (json.getString(key) != null
-					&& json.getString(key).startsWith("**OverideRead")) {
+			if (json.getString(key) != null && json.getString(key).startsWith("**OverideRead")) {
 				String lookInHM = json.getString(key).split("_")[1];
 				Iterator<String> it3 = requestOveride.keySet().iterator();
 				while (it3.hasNext()) {
@@ -200,16 +177,11 @@ public class RestRun implements Runnable {
 			}
 		}
 
-		// json is the JSONObject that has been overided
-		//RESTService sv = factory.getService(method[0], json);
-		//RESTService sv = factory.getService(json.get("Method").toString(), json, config);
-		//TODO: just use this factory to generate url and payload by the config JSON
-		//String nURL = sv.generateURL();
+		// json is the JSONObject that has been overided		
 		String nURL = factory.generateURL(r, config);
-		System.out.println("Generate URL: " + nURL);
-		String nPayload = r.get("payload").toString();
-		//String nPayload = sv.generatePayload().toString();
-		System.out.println("Generate payload: " + nPayload);
+		//System.out.println("Generate URL: " + nURL);
+		String nPayload = r.get("payload").toString();		
+		//System.out.println("Generate payload: " + nPayload);
 
 		switch (mType.valueOf(method[1])) {
 		case Post:
@@ -229,7 +201,6 @@ public class RestRun implements Runnable {
 			break;
 		}
 
-		//service = sv.getServiceString();
 		URL url = null;
 		if (r.has("url") && !StringUtils.isEmpty(r.getString("url"))){			
 			url = new URL(r.getString("url") + nURL);			
@@ -248,19 +219,18 @@ public class RestRun implements Runnable {
 		try {
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			System.out.println("URL IS " + con.getURL().getPath());
-			
+			/*
 			if(!_sessionID.equals("") ) //&& sv.isCookieNeeded())
 				con.setRequestProperty("Cookie", _sessionID);
+			*/
 			
-			System.out.println("Add cookie with " + _sessionID);
 			con.setRequestMethod(Method);
 			con.setRequestProperty("Authorization", "Basic " + authStringEnc);
 			con.setRequestProperty("Accept", "application/json");
 			con.setRequestProperty("Content-Type", "application/json");
 			// very important below: GET should not set setDoOutput(true)
 			if (!isGet) {
-				con.setDoOutput(true);
-				//con.getou
+				con.setDoOutput(true);				
 				OutputStream os = con.getOutputStream();
 				os.write(nPayload.getBytes("UTF-8"));
 				os.flush();
@@ -273,11 +243,9 @@ public class RestRun implements Runnable {
 			// REST RESPONSE
 			BufferedReader reader;
 			if (con.getResponseCode() == 200) {
-				reader = new BufferedReader(new InputStreamReader(
-						con.getInputStream()));
+				reader = new BufferedReader(new InputStreamReader(con.getInputStream()));
 			} else {
-				reader = new BufferedReader(new InputStreamReader(
-						con.getErrorStream()));
+				reader = new BufferedReader(new InputStreamReader(con.getErrorStream()));
 			}
 			StringBuilder responseBuilder = new StringBuilder();
 			String line = null;
@@ -323,30 +291,23 @@ public class RestRun implements Runnable {
 		for (int i = 0; i < fileLocList.size(); i++) {
 			String requestText = null;
 			try {
-				requestText = readFile(fileLocList.get(i).trim(),
-						StandardCharsets.UTF_8);
+				requestText = readFile(fileLocList.get(i).trim(), StandardCharsets.UTF_8);
 				JSONObject j = new JSONObject(requestText);
 				JSONObject[] theResult = sendReqeust(j, config);
-				String[] tempResult = vObj.validateP(theResult[2],
-						theResult[1], fileLocList.get(i), requestOveride,
-						description);
+				String[] tempResult = vObj.validateP(theResult[2], theResult[1], fileLocList.get(i), requestOveride, description);
 				validateResult[0] += tempResult[0];
 				if (requestShow) {
 					validateResult[0] += System.getProperty("line.separator")
 							+ "The request payload is:"
 							+ System.getProperty("line.separator");
-					validateResult[0] += new ForMatJSONStr()
-							.format(theResult[0].getJSONObject("payload").toString());
+					validateResult[0] += new ForMatJSONStr().format(theResult[0].getJSONObject("payload").toString());
 				}
 				if (responseShow) {
 					validateResult[0] += System.getProperty("line.separator")
-							+ "The response is:"
-							+ System.getProperty("line.separator");
-					validateResult[0] += new ForMatJSONStr()
-							.format(theResult[2].toString());
+							+ "The response is:" + System.getProperty("line.separator");
+					validateResult[0] += new ForMatJSONStr().format(theResult[2].toString());
 				}
-				validateResult[0] += "=============================>>>>>  "
-						+ tempResult[1];
+				validateResult[0] += "=============================>>>>>  " + tempResult[1];
 				if (tempResult[1].equals("FAILED")) {
 					validateResult[1] = "FAILED";
 				}
