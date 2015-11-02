@@ -188,7 +188,9 @@ public class beginningUI {
 		for (int i=0; i<failList.size(); i++){
 			sum += failList.get(i) + seperator;
 		}
-		r += seperator + seperator + sum;		
+		r += seperator + sum + 
+				"==================================================================" +
+				seperator + seperator + seperator;		
 		 
 		try {			
 			FileWriter fw = new FileWriter(reportPath);
@@ -215,8 +217,6 @@ public class beginningUI {
 			new beginningUI().init();		
 		else if (args[0].equals("NGUI")){
 			try{
-				
-			System.out.println("Your jar file path is: " + System.getProperty("user.dir")); 
 			FileReader fr = new FileReader(args[4]); 
 			String line = null;
 	        StringBuffer strBuffer = new StringBuffer();		

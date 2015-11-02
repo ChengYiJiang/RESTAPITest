@@ -96,10 +96,10 @@ public class RestRequestSender implements Callable<String[]> {
 		// System.out.println("the validation is "+result[1].toString());
 		result[0] = r; // now r contains "id"
 		
-		System.out.println("THe request before overide is " + r.toString());
+		//System.out.println("THe request before overide is " + r.toString());
 		overideParam(r);		
 		//now r has been overided
-		System.out.println("THe request after overide is " + r.toString());
+		//System.out.println("THe request after overide is " + r.toString());
 		String Method = "";
 		JSONObject json = new JSONObject(r.toString());		
 		String method[] = json.get("Method").toString().split("_");
@@ -162,7 +162,7 @@ public class RestRequestSender implements Callable<String[]> {
 		
 		try {
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
-			System.out.println("URL IS " + con.getURL().getPath());
+			//System.out.println("URL IS " + con.getURL().getPath());
 			
 			/*
 			if(!_sessionID.equals("") ) //&& sv.isCookieNeeded())
@@ -205,8 +205,7 @@ public class RestRequestSender implements Callable<String[]> {
 				else
 					responseJSON = factory.parseLeafJSONData(new JSONObject(), json.get("Method").toString(), config);				
 				
-			} else {
-				System.out.println(responseBuilder.toString());
+			} else {				
 				JSONObject temp = new JSONObject(responseBuilder.toString());
 				responseJSON = new JSONObject();
 				responseJSON.put("errors", temp.get("errors"));

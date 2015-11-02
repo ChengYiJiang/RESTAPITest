@@ -83,8 +83,7 @@ public class RestPropValidation {
 
 	// vSub is the JSONObject with key group id. it only contains levels!!!
 	public void searchGroupingValidation(JSONObject r, JSONObject vSub, String vKey, int offset) throws JSONException {
-		boolean result = true;		
-		//sizeOfV = vSub.
+		boolean result = true;	
 		//System.out.println("maxDeepth is: " + maxDeepth);
 		String levelOne = "";
 		
@@ -115,7 +114,7 @@ public class RestPropValidation {
 					//System.out.println("Found key " + key1 + " and the value is " + r.get(key1));
 					//System.out.println("HERE RESPONSE IS: " + r); 
 					if (r.get(key1) instanceof String || r.get(key1) instanceof Integer || JSONObject.NULL.equals(r.get(key1)) ) {
-						System.out.println("And key in response is a string with data " + r.get(key1));
+						//System.out.println("And key in response is a string with data " + r.get(key1));
 						if (temp.get(key1).toString().startsWith("**OverideSave")) {
 							String varName = temp.get(key1).toString().split("_")[1];
 							overideProps.put(varName, r.get(key1).toString());
@@ -265,7 +264,6 @@ public class RestPropValidation {
 					correctGroup.add(vKey);
 				}			
 				// System.out.println("Found group " + vKey + " And they are correct"); 
-				
 
 				// TODO: PRINT GROUP DETAILS MAY BE NOT
 			}
