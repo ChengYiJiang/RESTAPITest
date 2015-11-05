@@ -104,21 +104,22 @@ public class RestPropValidation {
 			JSONObject temp = vSub.getJSONObject(levelOne); // json
 			Iterator<String> groupIter = temp.keys(); // in group that (id -
 														// offset == 1)
-			//System.out.println("response here is " + r);
+			System.out.println("response here is " + r);
 			//System.out.println("vSub has levelOne: " + levelOne);
+			System.out.println("vSub has levelOne: " + levelOne + " and the validation json is: " + temp);
 			while (groupIter.hasNext()) {   //loop the validation json for that 
 				String key1 = groupIter.next(); // pair-value
-				//System.out.println("The key in grouping level map is " + key1 + " and now offset is "+offset + " now maxDeepth is " + maxDeepth);
+				System.out.println("The key in validation json we are validating now is: " + key1);
 
 				if (r.has(key1)) {
-					//System.out.println("Found key " + key1 + " and the value is " + r.get(key1));
+					System.out.println("Found key " + key1 + " and the value is " + r.get(key1));
 					//System.out.println("HERE RESPONSE IS: " + r); 
-					if (r.get(key1) instanceof String || r.get(key1) instanceof Integer || JSONObject.NULL.equals(r.get(key1)) ) {
-						//System.out.println("And key in response is a string with data " + r.get(key1));
+					if (r.get(key1) instanceof String || r.get(key1) instanceof Number || JSONObject.NULL.equals(r.get(key1)) || r.get(key1) instanceof Boolean) {
+						System.out.println("And key in response is a string with data " + r.get(key1));
 						if (temp.get(key1).toString().startsWith("**OverideSave")) {
 							String varName = temp.get(key1).toString().split("_")[1];
 							overideProps.put(varName, r.get(key1).toString());
-							//System.out.println("YYYYYYYYYYYYYYYYY!!!!!!!!!!!!    we overide save one of " + r.get(key1).toString());
+							System.out.println("YYYYYYYYYYYYYYYYY!!!!!!!!!!!!    we overide save one of " + r.get(key1).toString());
 							if (!checkGroup.get(vKey).contains(levelOne))
 								checkGroup.get(vKey).add(levelOne);
 						} else if (temp.get(key1).toString().startsWith("**OverideRead")) {
@@ -132,7 +133,7 @@ public class RestPropValidation {
 							}
 						} else if (!r.get(key1).toString().equals(temp.get(key1).toString())) { // not
 							// overide
-							//System.out.println("The key " + key1 + " with value " + r.get(key1) + " does not match that in map");
+							System.out.println("The key " + key1 + " with value " + r.get(key1) + " does not match that in map: " + temp.get(key1).toString());
 							//System.out.println("--------------------------------------");
 							//System.out.println("here we return false3");
 							//System.out.println("result before is: " + result);
@@ -156,6 +157,7 @@ public class RestPropValidation {
 				} else { // even not contain the key
 					//System.out.println("In offset: " + offset + " The key " + key1 + " is not found");
 					//System.out.println("--------------------------------------");
+					checkGroup.get(vKey).clear();
 					result = false;										
 				}
 			}
@@ -171,8 +173,13 @@ public class RestPropValidation {
 		//wentVLevels.add(levelOne);
 		if (result && !checkGroup.get(vKey).contains(levelOne))
 			checkGroup.get(vKey).add(levelOne);
+		//else //if (!checkGroup.get(vKey).contains(levelOne)){
+			//System.out.println("checkGroup with " + vKey + " already has level: " + levelOne + " but result is false");
+			//checkGroup.get(vKey).clear();
+		//}
+		//checkGroup.get(vKey).clear();
 		//System.out.println("THIS IS WHEN WE SUCCESSFULLY VERIFIED ONE LEVEL: " + levelOne);
-		//System.out.println("checkGroup is:\n" + checkGroup);			
+		System.out.println("checkGroup is:\n" + checkGroup);			
 		//System.out.println("---------------------------------------------------------------------");
 		
 		//KEEP GOING FOR NEXT LEVEL
@@ -186,11 +193,11 @@ public class RestPropValidation {
 					// check if it is a json object or json array
 					if (r.get(tmpStr) instanceof JSONObject) {
 						maxDeepth ++;
-						//System.out.println("IT IS A JSON Object with key: " + tmpStr);
+						System.out.println("IT IS A JSON Object with key: " + tmpStr);
 						searchGroupingValidation(r.getJSONObject(tmpStr), vSub, vKey, offset + 1);
 					} else if ((r.get(tmpStr) instanceof JSONArray)) {
 						maxDeepth ++;
-						//System.out.println("IT IS A JSON Array with key: " + tmpStr);
+						System.out.println("IT IS A JSON Array with key: " + tmpStr);
 						JSONArray jArray = r.getJSONArray(tmpStr);
 						boolean tempResult = false;
 						for (int i = 0; i < jArray.length(); i++) {

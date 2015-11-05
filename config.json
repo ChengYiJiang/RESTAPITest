@@ -28,5 +28,16 @@
 			"*__*itemId"
 		],
 		"parseLeaf":null		
+	},
+	"ModelList_Post":
+	{
+		"params":
+		[
+			"models",
+			"modelList",
+			"*__*pageNumber",
+			"*__*pageSize"
+		],
+		"parseLeaf":null		
 	}
 }
