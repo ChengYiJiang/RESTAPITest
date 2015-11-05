@@ -100,7 +100,7 @@ public class RestPropValidation {
 			}
 		}		
 		
-		if (vSub.has(levelOne)) { 
+		if (vSub.has(levelOne) && !checkGroup.get(vKey).contains(levelOne)) { 
 			JSONObject temp = vSub.getJSONObject(levelOne); // json
 			Iterator<String> groupIter = temp.keys(); // in group that (id -
 														// offset == 1)
