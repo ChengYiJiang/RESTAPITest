@@ -110,49 +110,60 @@ public class RestPropValidation {
 			while (groupIter.hasNext()) {   //loop the validation json for that 
 				String key1 = groupIter.next(); // pair-value
 				System.out.println("The key in validation json we are validating now is: " + key1);
-
 				if (r.has(key1)) {
 					System.out.println("Found key " + key1 + " and the value is " + r.get(key1));
+					String valueInResponse = null;
 					//System.out.println("HERE RESPONSE IS: " + r); 
-					if (r.get(key1) instanceof String || r.get(key1) instanceof Number || JSONObject.NULL.equals(r.get(key1)) || r.get(key1) instanceof Boolean) {
-						System.out.println("And key in response is a string with data " + r.get(key1));
-						if (temp.get(key1).toString().startsWith("**OverideSave")) {
-							String varName = temp.get(key1).toString().split("_")[1];
-							overideProps.put(varName, r.get(key1).toString());
-							System.out.println("YYYYYYYYYYYYYYYYY!!!!!!!!!!!!    we overide save one of " + r.get(key1).toString());
-							if (!checkGroup.get(vKey).contains(levelOne))
-								checkGroup.get(vKey).add(levelOne);
-						} else if (temp.get(key1).toString().startsWith("**OverideRead")) {
-							String varName = temp.get(key1).toString().split("_")[1];
-							String value = overideProps.get(varName);
-							// compare
-							if (r.get(key1).toString().equals(value)) {
-								if (!checkGroup.get(vKey).contains(levelOne))
-									checkGroup.get(vKey).add(levelOne);
-								//return false;
-							}
-						} else if (!r.get(key1).toString().equals(temp.get(key1).toString())) { // not
-							// overide
-							System.out.println("The key " + key1 + " with value " + r.get(key1) + " does not match that in map: " + temp.get(key1).toString());
-							//System.out.println("--------------------------------------");
-							//System.out.println("here we return false3");
-							//System.out.println("result before is: " + result);
-							result = false;//not equals to validation data
-						}
+					if (r.get(key1) instanceof String || JSONObject.NULL.equals(r.get(key1)) || r.get(key1) instanceof Boolean) {
+						valueInResponse = r.get(key1).toString();
+						System.out.println("And key in response is a string with data " + r.get(key1));							
 					} else if (r.get(key1).toString().equals("null")){ // key good but value is not a string
+						valueInResponse = "null";
 						if (!temp.get(key1).toString().equals("null")){	
 							result = false;
 							//System.out.println("validation is null BUT RESPONSE IS NOT NULL!");
 							//System.out.println("--------------------------------------");												
-						}
-					
-					} else { // key good but value is not a string
-						//System.out.println("Now we like do as toString() and compare whole string");
+						}					
+					} else if (isInteger(r.get(key1))){
+						System.out.println("IT IS INTEGER: " + key1);
+						valueInResponse = String.valueOf(Integer.parseInt(r.get(key1).toString().replace(".0", "")));
+					} else if (isDouble(r.get(key1))){
+						System.out.println("IT IS DOUBLE: " + key1);
+						valueInResponse = String.valueOf(Double.parseDouble(r.get(key1).toString()));
+					} 
+					else { // key good but value is not a string
+						System.out.println("Now we like do as toString() and compare whole string");
+						valueInResponse = r.get(key1).toString();
 						//System.out.println("In Validation JSON the value should be " + temp.get(key1).toString());
 						if (!r.get(key1).toString().contains(temp.get(key1).toString())){	
-							//System.out.println("--------------------------------------");
+							//System.out.println("--------------------------------------");							
 							result = false;			
 						}
+					}
+					//Now finish parsing the value
+					System.out.println("here valueInResponse is: " + valueInResponse);
+					if (temp.get(key1).toString().startsWith("**OverideSave")) {
+						String varName = temp.get(key1).toString().split("_")[1];
+						overideProps.put(varName, r.get(key1).toString());
+						System.out.println("YYYYYYYYYYYYYYYYY!!!!!!!!!!!!    we overide save one of " + r.get(key1).toString());
+						if (!checkGroup.get(vKey).contains(levelOne))
+							checkGroup.get(vKey).add(levelOne);
+					} else if (temp.get(key1).toString().startsWith("**OverideRead")) {
+						String varName = temp.get(key1).toString().split("_")[1];
+						String value = overideProps.get(varName);
+						// compare
+						if (valueInResponse.equals(value)) {
+							if (!checkGroup.get(vKey).contains(levelOne))
+								checkGroup.get(vKey).add(levelOne);
+							//return false;
+						}
+					} else if (!valueInResponse.equals(temp.get(key1).toString())) { // not
+						// overide
+						System.out.println("The key " + key1 + " with value " + r.get(key1) + " does not match that in map: " + temp.get(key1).toString());
+						//System.out.println("--------------------------------------");
+						//System.out.println("here we return false3");
+						//System.out.println("result before is: " + result);
+						result = false;//not equals to validation data
 					}
 				} else { // even not contain the key
 					//System.out.println("In offset: " + offset + " The key " + key1 + " is not found");
@@ -204,7 +215,7 @@ public class RestPropValidation {
 							Object obj = jArray.get(i);
 							//System.out.println("!!!!!! IN " + tmpStr + " WE GET ONE OBJECT WHICH IS: " + obj + " and vSub is: " + vSub);
 							if (obj instanceof JSONObject) {
-								searchGroupingValidation(jArray.getJSONObject(i), vSub, vKey, offset + 1);
+								searchGroupingValidation(jArray.getJSONObject(i), vSub, vKey, offset + 2);
 								
 							} else {
 								//System.out.println("why it is not jsonobject???");
@@ -337,4 +348,26 @@ public class RestPropValidation {
 		
 	}
 	
+	private boolean isInteger(Object o){
+		try {
+			String oo = "";			
+			if ((o.toString().endsWith(".0")))
+				oo = o.toString().replace(".0", "");			
+			Integer.parseInt(oo); 
+			return true; 
+		} catch (NumberFormatException e) { 
+			return false; 
+		}
+	}
+	
+	private boolean isDouble(Object o) { 
+		try { 
+			Double.parseDouble(o.toString()); 
+			if (o.toString().contains(".")) 
+				return true; 		
+		} catch (NumberFormatException e) { 
+			return false; 
+		} 
+		return false;
+	}
 }
