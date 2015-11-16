@@ -116,7 +116,7 @@ public class RestPropValidation {
 					//System.out.println("HERE RESPONSE IS: " + r); 
 					if (r.get(key1) instanceof String || JSONObject.NULL.equals(r.get(key1)) || r.get(key1) instanceof Boolean) {
 						valueInResponse = r.get(key1).toString();
-						System.out.println("And key in response is a string with data " + r.get(key1));							
+						//System.out.println("And key in response is a string with data " + r.get(key1));							
 					} else if (r.get(key1).toString().equals("null")){ // key good but value is not a string
 						valueInResponse = "null";
 						if (!temp.get(key1).toString().equals("null")){	
@@ -125,14 +125,14 @@ public class RestPropValidation {
 							//System.out.println("--------------------------------------");												
 						}					
 					} else if (isInteger(r.get(key1))){
-						System.out.println("IT IS INTEGER: " + key1);
+						//System.out.println("IT IS INTEGER: " + key1);
 						valueInResponse = String.valueOf(Integer.parseInt(r.get(key1).toString().replace(".0", "")));
 					} else if (isDouble(r.get(key1))){
-						System.out.println("IT IS DOUBLE: " + key1);
+						//System.out.println("IT IS DOUBLE: " + key1);
 						valueInResponse = String.valueOf(Double.parseDouble(r.get(key1).toString()));
 					} 
 					else { // key good but value is not a string
-						System.out.println("Now we like do as toString() and compare whole string");
+						//System.out.println("Now we like do as toString() and compare whole string");
 						valueInResponse = r.get(key1).toString();
 						//System.out.println("In Validation JSON the value should be " + temp.get(key1).toString());
 						if (!r.get(key1).toString().contains(temp.get(key1).toString())){	
@@ -145,7 +145,7 @@ public class RestPropValidation {
 					if (temp.get(key1).toString().startsWith("**OverideSave")) {
 						String varName = temp.get(key1).toString().split("_")[1];
 						overideProps.put(varName, r.get(key1).toString());
-						System.out.println("YYYYYYYYYYYYYYYYY!!!!!!!!!!!!    we overide save one of " + r.get(key1).toString());
+						//System.out.println("YYYYYYYYYYYYYYYYY!!!!!!!!!!!!    we overide save one of " + r.get(key1).toString());
 						if (!checkGroup.get(vKey).contains(levelOne))
 							checkGroup.get(vKey).add(levelOne);
 					} else if (temp.get(key1).toString().startsWith("**OverideRead")) {
@@ -157,7 +157,7 @@ public class RestPropValidation {
 								checkGroup.get(vKey).add(levelOne);
 							//return false;
 						}
-					} else if (!valueInResponse.equals(temp.get(key1).toString())) { // not
+					} else if (!valueInResponse.equals(temp.get(key1).toString().replaceAll("\\\\\\\"", "\\\""))) { // not
 						// overide
 						System.out.println("The key " + key1 + " with value " + r.get(key1) + " does not match that in map: " + temp.get(key1).toString());
 						//System.out.println("--------------------------------------");
@@ -320,6 +320,8 @@ public class RestPropValidation {
 					if (v.getJSONObject("0").get(key).toString().startsWith("**OverideSave")) { // overide save, do not validate
 						String varName = v.getJSONObject("0").get(key).toString().split("_")[1];
 						overideProps.put(varName, o.toString());
+						v.getJSONObject("0").remove(key);
+						result[0] += seperator + "Found key TO BE overided: " + key;
 					} else if (v.getJSONObject("0").get(key).toString().startsWith("**OverideRead")) { // overide read, do validate
 						String varName = v.getJSONObject("0").get(key).toString().toString().split("_")[1];
 						String value = overideProps.get(varName); // find from NOGROUP
@@ -331,7 +333,7 @@ public class RestPropValidation {
 						}
 					} else {
 						// System.out.println("do not need overide");
-						if (o.toString().equals(v.getJSONObject("0").get(key).toString())) {
+						if (o.toString().equals(v.getJSONObject("0").get(key).toString().replaceAll("\\\\\\\"", "\\\""))) {
 							v.getJSONObject("0").remove(key);
 							result[0] += seperator + "Found key-value pair: " + key + ":" + o.toString();
 							result[0] += "  and value as expected.";

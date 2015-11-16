@@ -36,7 +36,7 @@ public class RESTServiceFactory {
 			}
 			String urlParamsString = urlParams.toString();
 			if (urlParamsString.length() > 0)
-				urlParamsString = "?" + urlParamsString.substring(0, urlParamsString.length()-2);			
+				urlParamsString = "?" + urlParamsString.substring(0, urlParamsString.length()-1);			
 			
 			return sb.toString() + urlParamsString;
 		}

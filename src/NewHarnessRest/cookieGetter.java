@@ -36,4 +36,32 @@ public class cookieGetter {
 		return null;
 		
 	}
+	
+	public String getCookie(String ip, String username, String password){
+		
+		new SSLVerificationDisabler().disableSslVerification();	
+		//TODO: This admin:raritan should be somehow modified
+		String authString = username + ":" + password;
+		String authStringEnc = new String(Base64.encodeBase64(authString.getBytes()));
+		try {
+			URL url = new URL(ip);
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();
+
+			con.setRequestMethod("POST");
+			con.setRequestProperty("Authorization", "Basic " + authStringEnc);
+			con.setRequestProperty("Accept", "application/json");
+			con.setRequestProperty("Content-Type", "application/json");			
+			
+			con.setDoOutput(false);				
+			con.connect();
+			//to get the _sessionid
+			return con.getHeaderField("Set-Cookie").split(";")[0].split("=")[1];
+		} catch (MalformedURLException e1) {			
+			e1.printStackTrace();
+		} catch (IOException e) {			
+			e.printStackTrace();
+		}
+		return null;
+		
+	}
 }

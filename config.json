@@ -39,5 +39,41 @@
 			"*__*pageSize"
 		],
 		"parseLeaf":null		
+	},
+	"ipAddress_Get":
+	{
+		"params":
+		[
+			"ip",
+			"ipaddresses",
+			"*__*itemId"
+		],
+		"parseLeaf":null		
+	},
+	"item_Delete":
+	{
+		"params":
+		[
+			"items",
+			"*--*itemId"
+		],
+		"parseLeaf":null		
+	},
+	"item_Post":
+	{
+		"params":
+		[
+			"items"
+		],
+		"parseLeaf":null		
+	},
+	"item_Put":
+	{
+		"params":
+		[
+			"items",
+			"*--*itemId"
+		],
+		"parseLeaf":null		
 	}
 }

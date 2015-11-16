@@ -1,0 +1,1 @@
+{"Description":"","username":"admin","validation":{"0":{"responseMessage":"OK","responseCode":"200"}},"Method":"TEST_Get","payload":{},"password":"raritan","url":"https://192.168.46.200/api/v1/ip/ipaddresses?itemId=325"}

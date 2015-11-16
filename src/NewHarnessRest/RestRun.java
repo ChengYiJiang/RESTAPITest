@@ -41,7 +41,8 @@ import org.json.JSONObject;
 public class RestRun implements Runnable {
 
 	private static String seperator = System.getProperty("line.separator");
-	public JTextArea jta; // THIS IS THE GUI COMPONENT THE THREAD WILL APPEND RESULT AT
+	public JTextArea jta; // THIS IS THE GUI COMPONENT THE THREAD WILL APPEND
+							// RESULT AT
 	public List<String> FailedRecord;
 	private CountDownLatch downLatch;
 	private String sourcePath = "";
@@ -58,6 +59,7 @@ public class RestRun implements Runnable {
 	private boolean responseShow = false;
 	private String _sessionID = "";
 	private JSONObject config;
+	private cookieGetter cg = new cookieGetter();
 
 	private enum mType {
 		Post, Delete, Get, Put
@@ -82,7 +84,7 @@ public class RestRun implements Runnable {
 		} catch (IOException e) {
 			e.printStackTrace();
 		}
-		this.targetURL = turl;		
+		this.targetURL = turl;
 		this.sourcePath = tcPath;
 		this.validateResult[0] = seperator + seperator + "This thread proccessing test case: " + sourcePath;
 		this.validateResult[2] = sourcePath;
@@ -102,40 +104,41 @@ public class RestRun implements Runnable {
 		this.config = config;
 	}
 
-	// for overide params	
+	// for overide params
 	private void overideParam(JSONObject obj) throws JSONException {
 		Iterator<String> keys = obj.keys();
-		while(keys.hasNext()){
+		while (keys.hasNext()) {
 			String key = keys.next();
-			if (obj.get(key) instanceof String){
+			if (obj.get(key) instanceof String) {
 				if (obj.get(key).toString().startsWith("**OverideRead")) {
 					String varName = obj.get(key).toString().split("_")[1];
-					if (vObj.getOverideHM().containsKey(varName)){						
+					if (vObj.getOverideHM().containsKey(varName)) {
 						obj.put(key, vObj.getOverideHM().get(varName));
-					}						
-					else{						
+					} else {
 						obj.put(key, "No Variable overided!");
-					}						
+					}
 				}
-			} else if (obj.get(key) instanceof JSONObject){
+			} else if (obj.get(key) instanceof JSONObject) {
 				overideParam(obj.getJSONObject(key));
-			} else if (obj.get(key) instanceof JSONArray){
+			} else if (obj.get(key) instanceof JSONArray) {
 				JSONArray temp = (JSONArray) obj.get(key);
-				for (int i=0; i < temp.length(); i++){
-					//TODO: HANDLE OBJECT BUT NOT JSONOBJECT
+				for (int i = 0; i < temp.length(); i++) {
+					// TODO: HANDLE OBJECT BUT NOT JSONOBJECT
 					if (temp.get(i) instanceof JSONObject)
 						overideParam(temp.getJSONObject(i));
 				}
 			}
 		}
-		
+
 	}
 
-	// return JSONObject[3], [0] is request, [1] is the JSONObject for params validation, [2] is the response JSON
+	// return JSONObject[3], [0] is request, [1] is the JSONObject for params
+	// validation, [2] is the response JSON
 	public JSONObject[] sendReqeust(JSONObject r, JSONObject config) throws Throwable {
+
 		// start reading json
 		JSONObject[] result = new JSONObject[3];
-		
+
 		boolean isGet = false;
 		String URL = null;
 		if (r.has("url"))
@@ -146,23 +149,24 @@ public class RestRun implements Runnable {
 		r.remove("Description");
 		result[1] = (JSONObject) r.remove("validation");
 		// System.out.println("the validation is "+result[1].toString());
-		result[0] = r; 
-		
-		//System.out.println("THe request before overide is " + r.toString());
-		overideParam(r);		
-		//now r has been overided
-		//System.out.println("THe request after overide is " + r.toString());
+		result[0] = r;
+
+		// System.out.println("THe request before overide is " + r.toString());
+		overideParam(r);
+		// now r has been overided
+		// System.out.println("THe request after overide is " + r.toString());
 		String Method = "";
 		JSONObject json = new JSONObject(r.toString());
-		
+
 		String method[] = json.get("Method").toString().split("_");
-		
-		//---------------------------
-		//NOW METHOD IS STILL IN THE JSON AND FOR SERVICE TO PROCESS LIKE GENERATE THE URL		
+
+		// ---------------------------
+		// NOW METHOD IS STILL IN THE JSON AND FOR SERVICE TO PROCESS LIKE
+		// GENERATE THE URL
 		// Now for overide params in request body:
 		// Iterator all key - value and if the value starts with **Overide
-		// Then replace from HashMap		
-		
+		// Then replace from HashMap
+
 		Iterator<String> keys = json.keys();
 		while (keys.hasNext() && requestOveride.size() > 0) {
 			String key = keys.next();
@@ -177,11 +181,11 @@ public class RestRun implements Runnable {
 			}
 		}
 
-		// json is the JSONObject that has been overided		
+		// json is the JSONObject that has been overided
 		String nURL = factory.generateURL(r, config);
-		//System.out.println("Generate URL: " + nURL);
-		String nPayload = r.get("payload").toString();		
-		//System.out.println("Generate payload: " + nPayload);
+		// System.out.println("Generate URL: " + nURL);
+		String nPayload = r.get("payload").toString();
+		// System.out.println("Generate payload: " + nPayload);
 
 		switch (mType.valueOf(method[1])) {
 		case Post:
@@ -202,41 +206,43 @@ public class RestRun implements Runnable {
 		}
 
 		URL url = null;
-		if (r.has("url") && !StringUtils.isEmpty(r.getString("url"))){			
-			url = new URL(r.getString("url") + nURL);			
-		}
-		else
+		if (r.has("url") && !StringUtils.isEmpty(r.getString("url"))) {
+			url = new URL(r.getString("url") + nURL);
+		} else
 			url = new URL(targetURL + nURL);
-		
+
+		System.out.println("THE FINAL URL IS: " + r.getString("url") + nURL);
+
 		String authString = null;
-		if (checkHasProperty("username", r) && checkHasProperty("password", r))
-			authString = r.getString("username")+":"+r.getString("password");
-		else
+		if (checkHasProperty("username", r) && checkHasProperty("password", r)) {
+			authString = r.getString("username") + ":" + r.getString("password");
+			// _sessionID = cg.getCookie(r.getString("url"),
+			// r.getString("username"), r.getString("password"));
+		} else
 			authString = "admin:sunbird";
-		//String authString = "admin:raritan";
-		String authStringEnc = new String(Base64.encodeBase64(authString
-				.getBytes()));
+		// String authString = "admin:raritan";
+		String authStringEnc = new String(Base64.encodeBase64(authString.getBytes()));
 		try {
 			HttpURLConnection con = (HttpURLConnection) url.openConnection();
 			System.out.println("URL IS " + con.getURL().getPath());
-			/*
-			if(!_sessionID.equals("") ) //&& sv.isCookieNeeded())
-				con.setRequestProperty("Cookie", _sessionID);
-			*/
-			
+
+			System.out.println("cookie IS " + _sessionID);
+			// if (!_sessionID.equals("") ) //&& sv.isCookieNeeded())
+			// con.setRequestProperty("Cookie", _sessionID);
+
 			con.setRequestMethod(Method);
 			con.setRequestProperty("Authorization", "Basic " + authStringEnc);
 			con.setRequestProperty("Accept", "application/json");
 			con.setRequestProperty("Content-Type", "application/json");
 			// very important below: GET should not set setDoOutput(true)
 			if (!isGet) {
-				con.setDoOutput(true);				
+				con.setDoOutput(true);
 				OutputStream os = con.getOutputStream();
 				os.write(nPayload.getBytes("UTF-8"));
 				os.flush();
 				os.close();
 			}
-			con.connect();	
+			con.connect();
 
 			JSONObject responseJSON = null;
 
@@ -252,22 +258,21 @@ public class RestRun implements Runnable {
 			while ((line = reader.readLine()) != null) {
 				responseBuilder.append(line + "\n");
 			}
-			
-			if (con.getResponseCode() == 200) {							
-				if (responseBuilder.length() >= 2){
+
+			if (con.getResponseCode() == 200) {
+				if (responseBuilder.length() >= 2) {
 					responseJSON = factory.parseLeafJSONData(new JSONObject(responseBuilder.toString()), json.get("Method").toString(), config);
-				}
-				else
-					responseJSON = factory.parseLeafJSONData(new JSONObject(), json.get("Method").toString(), config);				
-				
+				} else
+					responseJSON = factory.parseLeafJSONData(new JSONObject(), json.get("Method").toString(), config);
+
 			} else {
 				System.out.println(responseBuilder.toString());
 				JSONObject temp = new JSONObject(responseBuilder.toString());
 				responseJSON = new JSONObject();
 				responseJSON.put("errors", temp.get("errors"));
 			}
-			
-			//put responsecode and msg into the responseJSON
+
+			// put responsecode and msg into the responseJSON
 			responseJSON.put("responseCode", con.getResponseCode());
 			responseJSON.put("responseMessage", con.getResponseMessage());
 			result[2] = responseJSON;
@@ -297,14 +302,11 @@ public class RestRun implements Runnable {
 				String[] tempResult = vObj.validateP(theResult[2], theResult[1], fileLocList.get(i), requestOveride, description);
 				validateResult[0] += tempResult[0];
 				if (requestShow) {
-					validateResult[0] += System.getProperty("line.separator")
-							+ "The request payload is:"
-							+ System.getProperty("line.separator");
+					validateResult[0] += System.getProperty("line.separator") + "The request payload is:" + System.getProperty("line.separator");
 					validateResult[0] += new ForMatJSONStr().format(theResult[0].getJSONObject("payload").toString());
 				}
 				if (responseShow) {
-					validateResult[0] += System.getProperty("line.separator")
-							+ "The response is:" + System.getProperty("line.separator");
+					validateResult[0] += System.getProperty("line.separator") + "The response is:" + System.getProperty("line.separator");
 					validateResult[0] += new ForMatJSONStr().format(theResult[2].toString());
 				}
 				validateResult[0] += "=============================>>>>>  " + tempResult[1];
@@ -319,7 +321,7 @@ public class RestRun implements Runnable {
 				validateResult[0] += seperator + "There is JSONException for this step... The step file may be broken";
 				validateResult[1] = "FAILED";
 				e.printStackTrace();
-			} catch (Throwable e) {				
+			} catch (Throwable e) {
 				e.printStackTrace();
 			}
 
@@ -340,8 +342,8 @@ public class RestRun implements Runnable {
 		}
 		this.downLatch.countDown();
 	}
-	
-	private boolean checkHasProperty(String key, JSONObject j) throws JSONException{
+
+	private boolean checkHasProperty(String key, JSONObject j) throws JSONException {
 		if (j.has(key) && j.get(key) != null)
 			return true;
 		return false;

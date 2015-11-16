@@ -1,0 +1,1 @@
+{"Description":"create mynewitem","username":"admin","validation":{"0":{"id":"**OverideSave_itemId","responseMessage":"OK","responseCode":"200"}},"Method":"item_Post","payload":{"cmbModel":"Proliant DL360 g5","cmbLocation":"SITE A","cmbMake":"HP","tiName":"MYNEWITEM"},"password":"raritan","url":"https://192.168.46.200/api/v1"}
