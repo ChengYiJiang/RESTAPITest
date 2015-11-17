@@ -17,6 +17,7 @@ import java.util.concurrent.Callable;
 import java.util.concurrent.ConcurrentHashMap;
 
 
+
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.json.*;
@@ -24,7 +25,7 @@ import org.json.*;
 //TODO ADD TO OPTION FOR REQUEST AND RESPONSE FOR OUTPUT WHEN RUNNING WITHOUT GUI
 
 public class RestRequestSender implements Callable<String[]> {
-	
+	private static String fileSeperator = System.getProperty("file.separator");
 	private String sourcePath = "";
 	private String targetURL = "";
 	private JSONObject inTC;
@@ -229,8 +230,8 @@ public class RestRequestSender implements Callable<String[]> {
 
 	@Override
 	public String[] call() throws Exception {		
-		for (int i = 0; i<fileLocList.size(); i++){
-			String requestText = readFile(fileLocList.get(i).trim(), StandardCharsets.UTF_8);
+		for (int i = 0; i<fileLocList.size(); i++){			
+			String requestText = readFile(sourcePath.replace(".tc", "") + fileSeperator + fileLocList.get(i).trim(), StandardCharsets.UTF_8);
 			
 			JSONObject j = new JSONObject(requestText);
 			//return JSONObject[3], [0] is request, [1] is the JSONObject for params validation, [2] is the response JSON

@@ -13,6 +13,7 @@ import java.util.concurrent.ExecutorCompletionService;
 import java.util.concurrent.ExecutorService;
 import java.util.concurrent.Executors;
 import java.util.concurrent.Future;
+
 import org.json.JSONObject;
 
 /*
@@ -76,7 +77,7 @@ public class MultiThreadRest {
 				}
 			} catch (IOException e) {					
 				e.printStackTrace();
-			}
+			}			
 			results.add(es.submit(new RestRequestSender(tcList.get(i), toThread, targetURL, config)));
 				
 			//Future<String[]> singleResult = es.submit(new RestRequestSender(tcList.get(i), toThread, targetURL, ta));

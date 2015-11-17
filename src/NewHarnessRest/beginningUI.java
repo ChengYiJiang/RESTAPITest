@@ -38,6 +38,7 @@ import org.json.JSONException;
 import org.json.JSONObject;
 
 public class beginningUI {
+	private static String fileSeperator = System.getProperty("file.separator");
 	private static String seperator = System.getProperty("line.separator");
 	private JTextField name = new JTextField(35);
 	private static String errMsg = "How to use: " + seperator +
@@ -168,7 +169,7 @@ public class beginningUI {
 		List<String> toRun = new ArrayList<String>();
 		for (int i=0; i<fList.length; i++){
 			if (fList[i].endsWith(".tc"))
-				toRun.add(folderPath+"/"+fList[i]);
+				toRun.add(folderPath + fileSeperator + fList[i]);
 		}
 		//TODO: numOfT:5 is a hardcode number of threads to be launched
 		ArrayList<String[]> result = new MultiThreadRest(toRun, "https://"+ ip, numOfT, false, false, config).runTestCases(toRun);

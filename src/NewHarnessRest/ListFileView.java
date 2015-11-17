@@ -31,6 +31,7 @@ import javax.swing.filechooser.FileNameExtensionFilter;
 import org.json.JSONObject;
 
 public class ListFileView extends JPanel {
+	private static String fileSeperator = System.getProperty("file.separator");
 	private JFileChooser chooser = new JFileChooser(".");
 	private JList<String> jl;
 	private DefaultListModel<String> listModel = new DefaultListModel<String>();
@@ -165,8 +166,16 @@ public class ListFileView extends JPanel {
 								saveFilePath += ".tc";
 							FileWriter fw = new FileWriter(saveFilePath);
 							if (!listModel.isEmpty()) {
-								for (int i = 0; i < listModel.size(); i++)
-									fw.write(listModel.get(i) + System.getProperty("line.separator"));
+								for (int i = 0; i < listModel.size(); i++){
+									String[] spit = null;									
+									if (fileSeperator.equals("/"))
+										spit = listModel.get(i).split(fileSeperator);
+									else if(fileSeperator.equals("\\")){										
+										spit = listModel.get(i).split("\\\\");
+									}
+									String fileName = spit[spit.length - 1];
+									fw.write(fileName + System.getProperty("line.separator"));
+								}
 							}
 							fw.close();
 						} catch (IOException e1) {
