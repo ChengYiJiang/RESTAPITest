@@ -162,7 +162,7 @@ public class beginningUI {
 	
 	
 	
-	public static void runWithoutGUI(String folderPath, String ip, String reportPath, JSONObject config) throws InterruptedException, ExecutionException{
+	public static void runWithoutGUI(String folderPath, String ip, String reportPath, JSONObject config, JSONObject globalValues) throws InterruptedException, ExecutionException{
 		
 		File folder = new File(folderPath);
 		String[] fList = folder.list();
@@ -172,7 +172,7 @@ public class beginningUI {
 				toRun.add(folderPath + fileSeperator + fList[i]);
 		}
 		//TODO: numOfT:5 is a hardcode number of threads to be launched
-		ArrayList<String[]> result = new MultiThreadRest(toRun, "https://"+ ip, numOfT, false, false, config).runTestCases(toRun);
+		ArrayList<String[]> result = new MultiThreadRest(toRun, ip, numOfT, false, false, config, globalValues).runTestCases(toRun);
 		ArrayList<String> failList = new ArrayList<String>(); 
 		
 		String r = "";
@@ -218,6 +218,9 @@ public class beginningUI {
 			new beginningUI().init();		
 		else if (args[0].equals("NGUI")){
 			try{
+			
+			
+				
 			FileReader fr = new FileReader(args[4]); 
 			String line = null;
 	        StringBuffer strBuffer = new StringBuffer();		
@@ -227,7 +230,7 @@ public class beginningUI {
 	            strBuffer.append(line + System.getProperty("line.separator"));
 	        }         
 	        br.close();	       
-			runWithoutGUI(args[1], args[2], args[3], new JSONObject(strBuffer.toString()) );
+			runWithoutGUI(args[1], args[2], args[3], new JSONObject(strBuffer.toString()), new globalValueLoader().loadGlobalValues(args[5]) );
 			
 			System.exit(0);
 			} catch (ArrayIndexOutOfBoundsException e){

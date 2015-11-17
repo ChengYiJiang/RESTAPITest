@@ -24,12 +24,13 @@ import org.json.JSONObject;
 public class MultiThreadRest {
 	
 	String seperator = System.getProperty("line.separator");
-	private String targetURL = "";
+	private String targetURL;
 	private List<String> files;
 	private int num = 0;
 	private boolean reqShow = false;
 	private boolean resShow = false;
 	private JSONObject config;
+	private JSONObject globalValues;
 	
 	
 	public MultiThreadRest(List<String> fList, String url, int number, boolean req, boolean res) {
@@ -40,13 +41,14 @@ public class MultiThreadRest {
 		this.resShow = res;
 	}
 	
-	public MultiThreadRest(List<String> fList, String url, int number, boolean req, boolean res, JSONObject config) {
+	public MultiThreadRest(List<String> fList, String url, int number, boolean req, boolean res, JSONObject config, JSONObject globalValues) {
 		this.files = fList;   //path of steps passed by test case
 		this.targetURL = url; //targetURL can be null since it can be assigned in test step
 		this.num = number;  //number of threads
 		this.reqShow = req;
 		this.resShow = res;   //these two are currently not used
 		this.config = config;  //config json passed in
+		this.globalValues = globalValues;
 	}
 	
 	
@@ -62,12 +64,10 @@ public class MultiThreadRest {
 
 		CompletionService<String[]> cs = new ExecutorCompletionService<String[]>(es);//(pool);
 		for (int i = 0; i < tcList.size(); i++) {
-			List<String> toThread = new ArrayList<String>();
-				//System.out.println("size is: "+tcList.size()+" index is :" + i);
+			List<String> toThread = new ArrayList<String>();				
 			try {					
 				br = new BufferedReader(new InputStreamReader(new FileInputStream(tcList.get(i))));
-			} catch (FileNotFoundException e) {
-				// TODO Auto-generated catch block
+			} catch (FileNotFoundException e) {				
 				e.printStackTrace();
 			}
 			try {
@@ -78,9 +78,8 @@ public class MultiThreadRest {
 			} catch (IOException e) {					
 				e.printStackTrace();
 			}			
-			results.add(es.submit(new RestRequestSender(tcList.get(i), toThread, targetURL, config)));
-				
-			//Future<String[]> singleResult = es.submit(new RestRequestSender(tcList.get(i), toThread, targetURL, ta));
+			results.add(es.submit(new RestRequestSender(tcList.get(i), toThread, targetURL, config, globalValues)));
+			
 			System.out.println("File #"+ (i+1) +" Submitted to the pool...");
 		}
 			

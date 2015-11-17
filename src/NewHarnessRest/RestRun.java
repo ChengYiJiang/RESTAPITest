@@ -105,7 +105,7 @@ public class RestRun implements Runnable {
 	}
 
 	// for overide params
-	private void overideParam(JSONObject obj) throws JSONException {
+	private void overideParam(JSONObject obj) throws Throwable {
 		Iterator<String> keys = obj.keys();
 		while (keys.hasNext()) {
 			String key = keys.next();
@@ -115,7 +115,8 @@ public class RestRun implements Runnable {
 					if (vObj.getOverideHM().containsKey(varName)) {
 						obj.put(key, vObj.getOverideHM().get(varName));
 					} else {
-						obj.put(key, "No Variable overided!");
+						//obj.put(key, "No Variable overided!");
+						System.out.println("Exception here, there is no value for override param: " + key);
 					}
 				}
 			} else if (obj.get(key) instanceof JSONObject) {

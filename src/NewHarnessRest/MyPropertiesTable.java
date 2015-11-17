@@ -54,11 +54,10 @@ public class MyPropertiesTable extends JTable{
 	@Override
 	public TableCellEditor getCellEditor(int row, int column) {		
 		int modelColumn = convertColumnIndexToModel( column );
-        if (modelColumn == 1 && this.getValueAt(row, 0).equals("responseCode"))  
-            return dceCode;
-        else if (modelColumn == 1 && this.getValueAt(row, 0).equals("responseMessage")){
-        	return dceMessage;
-        }
+       // if (modelColumn == 1 && this.getValueAt(row, 0).equals("responseCode"))  
+            //return dceCode;
+       // else if (modelColumn == 1 && this.getValueAt(row, 0).equals("responseMessage"))
+        	//return dceMessage;
         
         return super.getCellEditor(row, column);
 	}

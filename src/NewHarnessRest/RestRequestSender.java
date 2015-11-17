@@ -27,9 +27,7 @@ import org.json.*;
 public class RestRequestSender implements Callable<String[]> {
 	private static String fileSeperator = System.getProperty("file.separator");
 	private String sourcePath = "";
-	private String targetURL = "";
-	private JSONObject inTC;
-	private List<JSONObject> steps; // incoming steps
+	private String targetURL = "";		
 	private ConcurrentHashMap<String, String> requestOveride = new ConcurrentHashMap<String, String>();
 	private List<String> fileLocList;
 	private String[] validateResult = { "", "PASS", "" };
@@ -40,6 +38,7 @@ public class RestRequestSender implements Callable<String[]> {
 	private RESTServiceFactory factory = new RESTServiceFactory();
 	private String _sessionID = "";
 	private JSONObject config;
+	private JSONObject globalValues;
 	private enum mType {
 		Post, Delete, Get, Put
 	}
@@ -50,13 +49,14 @@ public class RestRequestSender implements Callable<String[]> {
 	}
 
 	//this constructor for run without GUI
-	public RestRequestSender(String tcPath, List<String> fL, String turl, JSONObject config) {
+	public RestRequestSender(String tcPath, List<String> fL, String turl, JSONObject config, JSONObject globalValues) {
 		this.targetURL = turl;
 		this.fileLocList = fL;
 		this.sourcePath = tcPath;
 		this.validateResult[0] = System.getProperty("line.separator") + "This thread proccessing test case: "+sourcePath + System.getProperty("line.separator");
 		this.validateResult[2] = sourcePath;		
 		this.config = config;
+		this.globalValues = globalValues;
 	}
 	
 	
@@ -95,12 +95,10 @@ public class RestRequestSender implements Callable<String[]> {
 		r.remove("Description");
 		result[1] = (JSONObject) r.remove("validation");
 		// System.out.println("the validation is "+result[1].toString());
-		result[0] = r; // now r contains "id"
+		result[0] = r; 
 		
-		//System.out.println("THe request before overide is " + r.toString());
 		overideParam(r);		
-		//now r has been overided
-		//System.out.println("THe request after overide is " + r.toString());
+		
 		String Method = "";
 		JSONObject json = new JSONObject(r.toString());		
 		String method[] = json.get("Method").toString().split("_");
@@ -158,17 +156,11 @@ public class RestRequestSender implements Callable<String[]> {
 		if (checkHasProperty("username", r) && checkHasProperty("password", r))
 			authString = r.getString("username")+":"+r.getString("password");
 		else
-			authString = "admin:sunbird"; //DEFAULT WE USE admin:sunbird		
+			authString = globalValues.getString("username") + ":" + globalValues.getString("password"); //DEFAULT WE USE admin:sunbird		
 		String authStringEnc = new String(Base64.encodeBase64(authString.getBytes()));
 		
 		try {
-			HttpURLConnection con = (HttpURLConnection) url.openConnection();
-			//System.out.println("URL IS " + con.getURL().getPath());
-			
-			/*
-			if(!_sessionID.equals("") ) //&& sv.isCookieNeeded())
-				con.setRequestProperty("Cookie", _sessionID);
-			*/
+			HttpURLConnection con = (HttpURLConnection) url.openConnection();	
 			
 			con.setRequestMethod(Method);
 			con.setRequestProperty("Authorization", "Basic " + authStringEnc);
