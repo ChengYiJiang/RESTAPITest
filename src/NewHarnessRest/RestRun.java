@@ -13,25 +13,12 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Paths;
-import java.security.KeyManagementException;
-import java.security.NoSuchAlgorithmException;
-import java.security.cert.X509Certificate;
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;
-import java.util.Map;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.CountDownLatch;
-
-import javax.net.ssl.HostnameVerifier;
-import javax.net.ssl.HttpsURLConnection;
-import javax.net.ssl.SSLContext;
-import javax.net.ssl.SSLSession;
-import javax.net.ssl.TrustManager;
-import javax.net.ssl.X509TrustManager;
 import javax.swing.JTextArea;
-
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONArray;
@@ -41,14 +28,11 @@ import org.json.JSONObject;
 public class RestRun implements Runnable {
 
 	private static String seperator = System.getProperty("line.separator");
-	public JTextArea jta; // THIS IS THE GUI COMPONENT THE THREAD WILL APPEND
-							// RESULT AT
+	public JTextArea jta; // THIS IS THE GUI COMPONENT THE THREAD WILL APPEND RESULT AT
 	public List<String> FailedRecord;
 	private CountDownLatch downLatch;
 	private String sourcePath = "";
 	private String targetURL = "";
-	private JSONObject inTC;
-	private List<JSONObject> steps; // incoming steps
 	private ConcurrentHashMap<String, String> requestOveride = new ConcurrentHashMap<String, String>();
 	private List<String> fileLocList;
 	private String[] validateResult = { "", "PASS", "" };
@@ -70,7 +54,7 @@ public class RestRun implements Runnable {
 		return new String(encoded, encoding);
 	}
 
-	public RestRun(String tcPath, String turl, JTextArea t, List<String> a, CountDownLatch l, boolean request, boolean response, String ssID) {
+	public RestRun(String tcPath, String turl, JTextArea t, List<String> a, CountDownLatch l, boolean request, boolean response, String ssID, JSONObject config) {
 		fileLocList = new ArrayList<String>();
 		_sessionID = ssID;
 		try {
@@ -93,6 +77,7 @@ public class RestRun implements Runnable {
 		this.downLatch = l;
 		this.requestShow = request;
 		this.responseShow = response;
+		this.config = config;
 	}
 
 	public RestRun(String turl, JTextArea t, List<String> steps, boolean request, boolean response, JSONObject config) {

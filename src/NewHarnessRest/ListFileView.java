@@ -23,6 +23,7 @@ import javax.swing.JFileChooser;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextField;
@@ -136,7 +137,11 @@ public class ListFileView extends JPanel {
 		JButton runRestButton = new JButton("Run");
 		runRestButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
-				
+				if (jl.getSelectedValuesList().size() < 1){
+					JOptionPane jop = new JOptionPane();
+					jop.showMessageDialog(null, "No test step is selected! Please select steps from the list.");
+					return;
+				}
 				new SSLVerificationDisabler().disableSslVerification(); // disabling HTTPS checks
 				ReportViewInMainUI reportView = new ReportViewInMainUI();
 				reportView.ta.append("Please wait for a while when processing the requestes......");

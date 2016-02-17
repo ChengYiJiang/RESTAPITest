@@ -11,7 +11,8 @@ public class globalValueLoader {
 
 	
 	public JSONObject loadGlobalValues(String path){
-		JSONObject result = null;
+		JSONObject result = new JSONObject();
+		
 		try{
 			FileReader fr = new FileReader(path); 
 			String line = null;
@@ -28,6 +29,7 @@ public class globalValueLoader {
 		} catch (IOException e) {			
 			e.printStackTrace();
 		}
+		System.out.println("globalValueLoad read global values: " + result);
 		return result;
 		
 	}

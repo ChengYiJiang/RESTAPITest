@@ -28,6 +28,7 @@ import javax.swing.JFormattedTextField;
 import javax.swing.JFrame;
 import javax.swing.JLabel;
 import javax.swing.JList;
+import javax.swing.JOptionPane;
 import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.JTextArea;
@@ -59,12 +60,27 @@ public class beginningUI {
 	private static int numOfT = 5;
 	private String textToShow = "";
 	private String sessionID = "";
-	
+	private JSONObject configJSON;
 	private JFileChooser chooser = new JFileChooser(".");
 	private String saveType[] = {"txt"};
 	
 	
-	public void init(){		
+	public void init() throws IOException, JSONException{	
+		
+		//MAKE SURE YOUR JAR FILE AND CONFIG FILE IS IN SAME FOLDER
+		FileReader fr = new FileReader(System.getProperty("user.dir") + "\\config.json");
+				
+		String line = null;
+		StringBuffer strBuffer = new StringBuffer();		
+		BufferedReader br = new BufferedReader(fr);
+		while ((line = br.readLine()) != null)
+		{
+			strBuffer.append(line + System.getProperty("line.separator"));
+		}         
+		br.close();
+		configJSON = new JSONObject(strBuffer.toString());
+		tcView.setConfig(configJSON);		
+		
 		JPanel setPanel = new JPanel();		
 		name.setText("Please input your target IP address");	
 		setPanel.add(name, BorderLayout.NORTH);
@@ -100,7 +116,11 @@ public class beginningUI {
 			public void actionPerformed(ActionEvent event) {
 				FailedResult.clear();
 				JList jl = tcView.getJList();				
-				int size = jl.getSelectedValuesList().size();				
+				int size = jl.getSelectedValuesList().size();
+				if (size < 1){
+					new JOptionPane().showMessageDialog(null, "No test case is selected");
+					return;
+				}
 				CountDownLatch latch = new CountDownLatch(size);
 				ta.append("Let's start testing " + size +" cases......");
 				new SSLVerificationDisabler().disableSslVerification();
@@ -108,7 +128,7 @@ public class beginningUI {
 				RestRunnerWatcher boss = new RestRunnerWatcher(latch, ta, FailedResult, size);
 				pool.execute(boss);				
 				for (int i = 0; i < jl.getSelectedValuesList().size(); i++) {
-					pool.execute(new Thread(new RestRun(jl.getSelectedValuesList().get(i).toString(), targetU, ta, FailedResult, latch, false, false, sessionID)));
+					pool.execute(new Thread(new RestRun(jl.getSelectedValuesList().get(i).toString(), targetU, ta, FailedResult, latch, false, false, sessionID, configJSON)));
 					System.out.println(targetU);
 				}	
 				pool.shutdown();
@@ -207,8 +227,7 @@ public class beginningUI {
 		} 
 		
 	}
-	
-	
+		
 	
 	public static void main(String[] args) throws Throwable {
 		// TODO Auto-generated method stub
@@ -217,10 +236,7 @@ public class beginningUI {
 		else if (args[0].equals("GUI"))
 			new beginningUI().init();		
 		else if (args[0].equals("NGUI")){
-			try{
-			
-			
-				
+			try{				
 			FileReader fr = new FileReader(args[4]); 
 			String line = null;
 	        StringBuffer strBuffer = new StringBuffer();		
@@ -229,7 +245,7 @@ public class beginningUI {
 	        {
 	            strBuffer.append(line + System.getProperty("line.separator"));
 	        }         
-	        br.close();	       
+	        br.close();
 			runWithoutGUI(args[1], args[2], args[3], new JSONObject(strBuffer.toString()), new globalValueLoader().loadGlobalValues(args[5]) );
 			
 			System.exit(0);

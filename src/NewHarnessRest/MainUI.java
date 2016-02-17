@@ -50,6 +50,7 @@ public class MainUI {
 	private ParamLibsView libsView;
 	private JSONObject configJSON;
 	private static String seperator = System.getProperty("line.separator");
+	private ForMatJSONStr jsonFormatter = new ForMatJSONStr();
 	
 	class doubleClick extends MouseAdapter{
 		public void mouseClicked(MouseEvent e) {
@@ -108,6 +109,7 @@ public class MainUI {
             public void actionPerformed(ActionEvent event) 
             {              	
             	String s = getParamsAndProps().toString();
+            	s = jsonFormatter.format(s);
             	//System.out.println("it is "+s);
             	JFileChooser chooser = new JFileChooser(".");
             	String saveType[] = { "json" };
@@ -142,6 +144,7 @@ public class MainUI {
 			public void actionPerformed(ActionEvent arg0) {
 				// TODO Auto-generated method stub	
 				String s = getParamsAndProps().toString();
+				s = jsonFormatter.format(s);
 				FileWriter fw = null;
 				try {
 					fw = new FileWriter(requestView.getSaveFilePath());

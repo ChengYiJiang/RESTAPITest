@@ -1,16 +1,9 @@
 package NewHarnessRest;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
-import services.mobile.MobilePlacementService;
-import services.mobile.MobileSearchService;
 
 public class RESTServiceFactory {
 
@@ -19,8 +12,11 @@ public class RESTServiceFactory {
 	}
 	
 	//This is the rule to generateURL from config file
-	public String generateURL(JSONObject r, JSONObject methodConfig) throws JSONException{		
+	public String generateURL(JSONObject r, JSONObject methodConfig) throws JSONException{	
+		if (r.getString("Method") == null)			
+			System.out.println("method null");
 		JSONObject sv = methodConfig.getJSONObject(r.getString("Method"));
+		
 		if (sv.has("params")){
 			JSONArray paramsList = sv.getJSONArray("params");
 			StringBuilder sb = new StringBuilder();

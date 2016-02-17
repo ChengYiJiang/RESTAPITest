@@ -23,14 +23,21 @@ import javax.swing.JPanel;
 import javax.swing.JScrollPane;
 import javax.swing.filechooser.FileNameExtensionFilter;
 
+import org.json.JSONObject;
+
 public class ListTestCaseView extends JPanel {
 	private JFileChooser chooser = new JFileChooser(".");
 	private JList<String> jl;
 	private DefaultListModel<String> listModel = new DefaultListModel<String>();	
-	private String url = "";	
+	private String url = "";
+	private JSONObject config;
 
 	public ListTestCaseView() {
 		init();
+	}
+	
+	public void setConfig(JSONObject config){
+		this.config = config;
 	}
 
 	public ListTestCaseView(String fP) throws IOException {
@@ -78,7 +85,7 @@ public class ListTestCaseView extends JPanel {
 		editButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {
 				try {
-					new MainUI(jl.getSelectedValue()).init();
+					new MainUI(jl.getSelectedValue(), config).init();
 				} catch (Throwable e) {					
 					e.printStackTrace();
 				}
@@ -115,7 +122,7 @@ public class ListTestCaseView extends JPanel {
 		createTCButton.addActionListener(new ActionListener() {
 			public void actionPerformed(ActionEvent event) {								
 				try {
-					new MainUI("", null).init();
+					new MainUI("", config).init();
 				} catch (Throwable e) {					
 					e.printStackTrace();
 				}
